@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : md_tab_label.js
 * Created at  : 2019-07-05
-* Updated at  : 2019-10-04
+* Updated at  : 2019-12-22
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -15,7 +15,7 @@
 
 // ignore:end
 
-//var ripple = require("../factories/md_ripple_factory");
+const MDRipple = require("../utils/ripple");
 
 module.exports = {
     selector   : "md-tab-label",
@@ -40,6 +40,8 @@ module.exports = {
             });
         }
         */
+
+        this.$ripple = new MDRipple($element);
 
         $md_tab.$label = $element;
         $md_tabs.$pagination.append($element);

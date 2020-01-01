@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : menu.js
 * Created at  : 2019-10-08
-* Updated at  : 2019-10-11
+* Updated at  : 2019-12-22
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -85,10 +85,11 @@ class MDMenuService {
             mdMenu[rect="rect"] >
                 .md-menu-background[style="${ bg_style };"] >
                     mdList[mdElevation="1"] >
-                        mdListItem[
+                        mdListItem.md-block[
                             (click) = "select($index)"
                             forEach = "option in options"
-                        ]({{ option.text }})
+                        ] >
+                            span({{ option.text }})
         `.replace("{{", "${").replace("}}", '}'));
 
         const elements = await compile(template_node, root);

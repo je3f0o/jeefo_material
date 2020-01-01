@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : md_tabs.js
 * Created at  : 2019-07-04
-* Updated at  : 2019-10-06
+* Updated at  : 2019-12-22
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -19,6 +19,7 @@ const EventEmitter = require("@jeefo/utils/event_emitter");
 const array_remove = require("@jeefo/utils/array/remove");
 
 const style = `
+/* css */
 md-tabs {
     margin        : 0;
     display       : block;

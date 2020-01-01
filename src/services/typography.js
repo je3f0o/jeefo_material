@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : typography.js
 * Created at  : 2019-10-07
-* Updated at  : 2019-10-11
+* Updated at  : 2019-12-02
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -17,6 +17,7 @@
 
 const styles   = require("@jeefo/component/styles");
 const for_each = require("@jeefo/utils/object/for_each");
+const Color    = require("../utils/color");
 
 const weigths = {
     thin        : 100,
@@ -37,6 +38,29 @@ class MDTypography {
         this.config = {
             root_font_size      : 16,
             default_font_family : "Roboto",
+
+            colors : {
+                primary           : "white",
+                primary_variant   : "white",
+                secondary         : "white",
+                secondary_variant : "white",
+                error             : "#B00020",
+                surface           : "white",
+                background        : "white",
+
+                on_primary    : "black",
+                on_secondary  : "black",
+                on_surface    : "white",
+                on_background : "white",
+                on_error      : "black",
+            },
+
+            emphasis : {
+                high     : 0.87,
+                medium   : 0.6,
+                disabled : 0.38,
+                error    : 1,
+            }
         };
 
         this.styles = {
@@ -115,11 +139,8 @@ class MDTypography {
     }
 
     init (config = {}) {
-        for_each(this.config, (prop, value) => {
-            if (! config[prop]) {
-                config[prop] = value;
-            }
-        });
+        config = Object.assign({}, this.config, config);
+        const { colors, emphasis } = config;
 
         const rules                 = [];
         const font_famity_selectors = [];
@@ -165,6 +186,57 @@ class MDTypography {
 		this.style_el.textContent = rules.map(rule => {
             return `${ rule.selector } { ${ rule.props.join("; ") }; }`;
         }).join('\n');
+
+        this.colors = {};
+        const on_colors = [
+            {
+                name  : "on_primary",
+                color : new Color(colors.on_primary),
+            },
+            {
+                name  : "on_secondary",
+                color : new Color(colors.on_secondary),
+            },
+            {
+                name  : "on_error",
+                color : new Color(colors.on_error),
+            },
+            {
+                name  : "on_surface",
+                color : new Color(colors.on_surface),
+            },
+            {
+                name  : "on_background",
+                color : new Color(colors.on_background),
+            },
+        ];
+
+        const emphasis_array = [
+            {
+                suffix  : "high",
+                opacity : emphasis.high,
+            },
+            {
+                suffix  : "medium",
+                opacity : emphasis.medium,
+            },
+            {
+                suffix  : "error",
+                opacity : emphasis.error,
+            },
+            {
+                suffix  : "disabled",
+                opacity : emphasis.disabled,
+            },
+        ];
+
+        // Color enphasis
+        on_colors.forEach(({ name, color }) => {
+            emphasis_array.forEach(({ suffix, opacity }) => {
+                this.colors[`${ name }_${ suffix }`] = color.toString(opacity);
+            });
+            this.colors[name] = this.colors[`${ name }_high`];
+        });
     }
 }
 

@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : md_sidenav_container.js
 * Created at  : 2019-06-21
-* Updated at  : 2019-09-13
+* Updated at  : 2019-12-11
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -16,34 +16,39 @@
 // ignore:end
 
 const style = `
+/* css */
 md-sidenav-container {
     z-index  : 0;
     display  : block;
     overflow : hidden;
     position : relative;
 }
-.md-sidenav-slider-wrapper {
+.md-sidenav-wrapper {
     box-sizing : border-box;
-    transition : padding .4s cubic-bezier(.25,.8,.25,1);
 }
-.md-sidenav-slider {
-    position: relative;
+.md-sidenav-wrapper.md-sidenav-mode-side {
+    transition : padding-left .4s cubic-bezier(.25,.8,.25,1),
+                 padding-right .4s cubic-bezier(.25,.8,.25,1);
 }
-.md-sidenav-slider-wrapper,
-.md-sidenav-slider {
-    height : 100%;
-}
-.md-sidenav-content {
-    height   : 100%;
+.md-sidenav-viewport {
     position : relative;
+}
+.md-sidenav-wrapper,
+.md-sidenav-viewport,
+.md-sidenav-content {
+    height : 100%;
 }
 md-sidenav {
     top        : 0;
-    bottom     : 0;
-    position   : absolute;
     width      : 320px;
-    z-index    : 3;
+    bottom     : 0;
+    z-index    : 2;
+    position   : absolute;
     box-sizing : border-box;
+}
+md-sidenav.md-sidenav-mode-over {
+    transition : margin-left .4s cubic-bezier(.25,.8,.25,1),
+                 margin-right .4s cubic-bezier(.25,.8,.25,1);
 }
 .md-sidenav-backdrop {
     opacity          : .48;
@@ -62,19 +67,10 @@ module.exports = {
     style,
     template : `
         { jt }
-        .md-sidenav-slider-wrapper >
-            .md-sidenav-slider >
-                .md-sidenav-wrapper >
-                    jfContent[select="md-sidenav"] ^
+        .md-sidenav-wrapper >
+            .md-sidenav-viewport >
                 .md-sidenav-content >
-                    jfContent
+                    jfContent ^
+                jfContent[select="md-sidenav"]
     `,
-    controller : {
-        on_init : function ($element) {
-            this.$z               = 100;
-            this.$slider          = $element.children(0);
-            this.$content_wrapper = this.$slider.first(".md-sidenav-content");
-        },
-    },
-    controller_name : "$md_sidenav_container",
 };

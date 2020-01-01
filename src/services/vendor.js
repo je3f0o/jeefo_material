@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : vendor.js
 * Created at  : 2019-10-07
-* Updated at  : 2019-10-08
+* Updated at  : 2019-12-04
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -65,6 +65,13 @@ class MDVendorService {
         }
 
         return supported_props[property] !== null;
+    }
+
+    property (property) {
+        if (this.has_support(property)) {
+            return supported_props[property];
+        }
+        return null;
     }
 
     prefix (property, value) {

@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : md_input_container.js
 * Created at  : 2019-07-18
-* Updated at  : 2019-12-29
+* Updated at  : 2019-12-15
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -28,7 +28,10 @@ const { slice } = Array.prototype;
 const inputs    = ["input", "select", "textarea"];
 
 const on_change = ($element, $input) => {
-    if ($input.value) {
+    let value = $input.has_attr("contenteditable") ? $input.text : $input.value;
+    console.log(value);
+
+    if (value) {
         $element.add_class("activated");
     } else {
         $element.remove_class("activated");
@@ -79,22 +82,21 @@ const init_input = ($element, $input) => {
 };
 
 const init_select = ($element, $select, ctrl) => {
-    const $overlay    = $element.first(".md-input-overlay");
-    const dom_options = $select.DOM_element.options;
-
+    const dom_options    = $select.DOM_element.options;
     const change_handler = () => {
         if ($select.value) {
             const { text } = dom_options[$select.DOM_element.selectedIndex];
             $element.add_class("activated");
-            $overlay.text = text;
+            $element.set_attr("label", text);
         } else {
             $select.remove_class("activated");
-            $overlay.text = '';
         }
     };
     change_handler();
 
     listen_focus_event_handlers($element, $select);
+
+    $element.add_class("dropdown");
 
     const show_menu = () => {
         if (menu_service.is_activated) {
@@ -158,19 +160,13 @@ const init_select = ($element, $select, ctrl) => {
     });
 };
 
-const create_editable = ($element, $textarea) => {
+const replace_textarea = ($element, $textarea) => {
     const $input = jqlite('<div class="md-input" contenteditable></div>');
-    $textarea.style("display", "none");
-    $textarea.before($input);
+    $textarea.replace($input);
 
     listen_focus_event_handlers($element, $input);
-    $input.on("input", () => {
-        $textarea.value = $input.text;
-        on_change($element, $textarea);
-    });
-    on_change($element, $textarea);
-
-    return $input;
+    $input.on("input", () => on_change($element, $input));
+    on_change($element, $input);
 };
 
 const style = `
@@ -222,11 +218,25 @@ md-input-container select.md-input {
     cursor : pointer;
     ${ vendor.prefix("appearance", "none") }
 }
+md-input-container.dropdown.focused {
+    background-color: transparent;
+}
+md-input-container.activated.dropdown:after {
+    top           : 0;
+    z-index       : -1;
+    content       : attr(label);
+    overflow      : hidden;
+    position      : absolute;
+    padding-top   : 25px;
+    white-space   : nowrap;
+    text-overflow : ellipsis;
+}
 
 /* icon */
 md-input-container > md-icon {
-    top      : 16px;
-    position : absolute;
+    top       : 50%;
+    position  : absolute;
+    transform : translateY(-50%);
 }
 md-input-container > md-icon.md-input-leading-icon {
     left : 16px;
@@ -235,6 +245,17 @@ md-input-container > md-icon.md-input-trailing-icon {
     right : 16px;
 }
 /*
+md-input-container .md-input {
+    color            : rgba(255,255,255,0.87);
+    width            : 100%;
+    padding          : 0;
+    display          : block;
+    position         : relative;
+    background-color : transparent;
+}
+md-input-container .md-input[contenteditable] {
+    word-break: break-word;
+}
 md-input-container .md-input,
 md-input-container .md-placeholder {
     font-size      : 13px;
@@ -252,25 +273,29 @@ md-input-container .md-placeholder {
 }
 */
 
-/* select */
-md-input-container .md-input-overlay {
-    top            : 0;
-    left           : 0;
-    width          : 100%;
-    height         : 100%;
-    padding        : 25px 40px 11px 16px;
-    position       : absolute;
-    overflow       : hidden;
-    font-size      : 16px;
-    box-sizing     : border-box;
-    line-height    : 20px;
-    white-space    : nowrap;
-    text-overflow  : ellipsis;
-    pointer-events : none;
+/*
+md-input-container.focused .underline .focused {
+    transform: none;
 }
-md-input-container > md-icon.caret {
-    right : 8px;
+.underline .focused,
+.underline .unfocused {
+    width    : 100%;
+    position : absolute;
 }
+.underline .focused {
+    top              : 0;
+    height           : 100%;
+    transform        : scale(0);
+    transition       : transform 0.25s;
+    transform-origin : center center;
+    background-color : rgba(255,255,255,0.87);
+}
+.underline .unfocused {
+    bottom           : 0;
+    height           : 1px;
+    background-color : rgba(255,255,255,0.38);
+}
+*/
 
 /* filled */
 md-input-container.md-input-filled label {
@@ -420,25 +445,13 @@ const notch_node = jeefo_template.parse(`
 `)[0];
 const underline_node = jeefo_template.parse(".underline")[0];
 
-const input_overlay = jeefo_template.parse(`
-{ jt }
-.md-input-overlay +
-mdIcon.caret[name="arrow_drop_down"]
-`);
-
 module.exports = {
     selector : "md-input-container",
-
-    dependencies : {
-        form : "?form"
-    },
 
     style,
 
     template : node => {
-        const has_select = node.children.find(n => n.name === "select");
         const icon_index = node.children.findIndex(n => n.name === "md-icon");
-
         if (icon_index >= 0) {
             const input_index = node.children.findIndex(n => {
                 return inputs.includes(n.name);
@@ -491,10 +504,6 @@ module.exports = {
             node.class_list.push("md-input-filled");
             node.children.push(underline_node);
         }
-
-        if (has_select) {
-            input_overlay.forEach(n => node.children.push(n.clone(true)));
-        }
     },
 
     bindings : {
@@ -518,13 +527,12 @@ module.exports = {
             $input.add_class("md-input");
 
             $element.once("renderable", () => {
-                let $editable;
                 switch ($input.name) {
                     case "INPUT" :
                         init_input($element, $input);
                         break;
                     case "TEXTAREA" :
-                        $editable = create_editable($element, $input);
+                        replace_textarea($element, $input);
                         break;
                     case "SELECT" :
                         init_select($element, $input, this);
@@ -533,18 +541,6 @@ module.exports = {
                         console.warn(
                             `MDInput ${ $input.name } is not implemented yet.`
                         );
-                }
-
-                const model_name = $input.get_attr("name");
-                const model = (
-                    model_name && this.form &&
-                    this.form.__form_data.models[model_name]
-                );
-                if (model) {
-                    this[model_name] = model;
-                    if ($editable) {
-                        model.connect($editable);
-                    }
                 }
             });
 
