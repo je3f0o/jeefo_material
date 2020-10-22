@@ -1,0 +1,13 @@
+
+=flex-grow ($is_inline: false)
+    display   : if($is_inline, inline-flex, flex)
+    flex-grow : 1
+
+=flex-center ($is_inline: false)
+    display         : if($is_inline, inline-flex, flex)
+    align-items     : center
+    justify-content : center
+
+=flex-v-center ($is_inline: false)
+    display     : if($is_inline, inline-flex, flex)
+    align-items : center

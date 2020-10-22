@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : md_sidenav.js
 * Created at  : 2019-06-21
-* Updated at  : 2019-12-13
+* Updated at  : 2020-06-09
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -77,7 +77,7 @@ class MDSidenavSideController {
         if (options.is_rendered) {
             set_styles();
         } else {
-            $element.once("renderable", set_styles);
+            $element.once("render", set_styles);
         }
     }
 
@@ -151,7 +151,7 @@ class MDSidenavOverController {
         if (options.is_rendered) {
             set_styles();
         } else {
-            $element.once("renderable", set_styles);
+            $element.once("render", set_styles);
         }
     }
 

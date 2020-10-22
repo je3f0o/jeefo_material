@@ -1,0 +1,15 @@
+.md-input__notch-wrapper >
+    .md-input__notch >
+        .md-input__notch-head +
+        .md-input__notch-body >
+            .md-input__notch-body__content +
+            .md-input__notch-body__space-filler +
+            jfContent[select="label"] ^
+        .md-input__notch-tail ^
+    .md-input__wrapper >
+        jfContent[select="input"] +
+        jfContent[select="select"] +
+        jfContent[select="textarea"]
+    ^   ^
+jfContent[select="md-icon"] +
+jfContent[select="helper-text"]

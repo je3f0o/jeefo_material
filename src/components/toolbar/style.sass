@@ -1,0 +1,17 @@
+
+@import '@jeefo/material'
+
+.md-toolbar
+    $line-height        : 40px
+    $vertical-padding   : 8px
+    $horizontal-padding : 16px
+
+    display: block
+
+    > .md-surface > .md-surface__inner
+        //+rel
+        +flex-v-center
+        height      : $line-height + $vertical-padding * 2
+        padding     : $vertical-padding $horizontal-padding
+        font-size   : 20px
+        line-height : $line-height

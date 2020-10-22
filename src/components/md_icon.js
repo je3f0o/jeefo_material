@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : md_icon.js
 * Created at  : 2019-07-21
-* Updated at  : 2019-12-06
+* Updated at  : 2020-10-13
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -27,6 +27,7 @@ module.exports = {
         fill_color : "@color",
     },
     style : `
+        /* css */
         md-icon {
             display        : inline-block;
             vertical-align : middle;
@@ -42,6 +43,8 @@ module.exports = {
     `,
     controller : function ($element) {
         const $svg = $element.children(0);
+        $element.add_class("md-icon");
+
         if (this.fill_color) {
             $svg.set_attr("fill", this.fill_color);
         }

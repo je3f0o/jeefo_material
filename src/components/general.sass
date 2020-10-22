@@ -1,0 +1,46 @@
+
+$primary-color: #5eb8ff
+
+=size($width, $height: $width)
+    width  : $width
+    height : $height
+
+=min-size($width, $height: $width)
+    min-width  : $width
+    min-height : $height
+
+=max-size($width, $height: $width)
+    max-width  : $width
+    max-height : $height
+
+=truncate
+    overflow      : hidden
+    white-space   : nowrap
+    text-overflow : ellipsis
+
+=flex-grow
+    display   : flex
+    flex-grow : 1
+
+=flex-center
+    display         : flex
+    align-items     : center
+    justify-content : center
+
+=pos($position, $top: null, $right: null, $bottom: null, $left: null)
+    position: $position
+    @if $top != null
+        top: $top
+    @if $right != null
+        right: $right
+    @if $bottom != null
+        bottom: $bottom
+    @if $left != null
+        left: $left
+
+=fix($top: null, $right: null, $bottom: null, $left: null)
+    +pos(fixed, $top, $right, $bottom, $left)
+=abs($top: null, $right: null, $bottom: null, $left: null)
+    +pos(absolute, $top, $right, $bottom, $left)
+=rel($top: null, $right: null, $bottom: null, $left: null)
+    +pos(relative, $top, $right, $bottom, $left)

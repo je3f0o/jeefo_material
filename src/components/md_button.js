@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : md_button.js
 * Created at  : 2019-07-21
-* Updated at  : 2019-12-29
+* Updated at  : 2020-06-25
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -15,9 +15,21 @@
 
 // ignore:end
 
-const Observer      = require("@jeefo/observer");
-const MDRipple      = require("@jeefo/material/utils/ripple");
-const prop_disabled = Symbol("is-disabled");
+const Observer       = require("@jeefo/observer");
+const JeefoDOMParser = require("@jeefo/jqlite/dom_parser");
+
+const ripple = JeefoDOMParser.parse(`{jt} mdRipple`)[0];
+
+const replace_tag_name = (element, tag_name) => {
+    const replacement = document.createElement(tag_name);
+    for (const attr of element.attributes) {
+        replacement.setAttribute(attr.name, attr.value);
+    }
+    while (element.firstChild) {
+        replacement.appendChild(element.firstChild);
+    }
+    return replacement;
+};
 
 const style = `
 /* css */
@@ -50,7 +62,8 @@ const style = `
                 0 2px 2px 0 rgba(0,0,0,.14),
                 0 1px 5px 0 rgba(0,0,0,.12);
 }
-.md-button.md-button-raised:not([disabled]):hover {
+.md-button.md-button-raised:not([disabled]):hover,
+.md-button.md-button-raised.md-hovered:not([disabled]) {
     box-shadow: 0 2px 4px -1px rgba(0,0,0,.2),
                 0 4px 5px 0 rgba(0,0,0,.14),
                 0 1px 10px 0 rgba(0,0,0,.12);
@@ -101,16 +114,19 @@ module.exports = {
     selector : "md-button",
     style,
 
-    template : node => {
-		if (node.attrs.has("href")) {
-			node.name = 'a';
-		} else {
-			node.name = "button";
-			if (! node.attrs.has("type")) {
-				node.attrs.set("type", "button");
+    template : element => {
+        let new_element;
+        if (element.hasAttribute("href")) {
+            new_element = replace_tag_name(element, 'a');
+        } else {
+            new_element = replace_tag_name(element, "button");
+			if (! new_element.hasAttribute("type")) {
+				new_element.setAttribute("type", "button");
 			}
 		}
-		node.class_list.push("md-button");
+		new_element.classList.add("md-button");
+		new_element.appendChild(ripple.cloneNode());
+        return new_element;
 
 		/*
 		node.children.find(child => {
@@ -123,7 +139,7 @@ module.exports = {
     },
 
 	bindings : {
-		[prop_disabled] : "<isDisabled"
+		is_disabled : "<isDisabled"
 	},
 
 	controller ($element) {
@@ -136,12 +152,8 @@ module.exports = {
 			}
 		};
 
-		observer.on(prop_disabled, disable_handler);
-        disable_handler(this[prop_disabled]);
-
-        const attr_ripple = $element.get_attr("ripple");
-        if (! attr_ripple || attr_ripple.trim().toLowerCase() !== "off") {
-            this.ripple = new MDRipple($element);
-        }
-	}
+		observer.on("is_disabled", disable_handler);
+        disable_handler(this.is_disabled);
+	},
+    controller_name: "$md_button"
 };

@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : ripple.js
 * Created at  : 2019-12-15
-* Updated at  : 2019-12-31
+* Updated at  : 2020-06-23
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -24,13 +24,21 @@ const DURATION         = 450;
 const CSS_DURATION     = (DURATION * 2) / 1e3;
 //const LEAVING_DURATION = DURATION * 0.35;
 
+/* css
 styles.add_style(`
-/* css */
 @keyframes md-ripple-remove {
     from { opacity : .15; }
     to   { opacity : 0;   }
 }
 
+.md-ripple-container {
+    top      : 0;
+    left     : 0;
+    width    : 100%;
+    height   : 100%;
+    position : absolute;
+    overflow : hidden;
+}
 .md-ripple-container:before {
     top              : 0;
     left             : 0;
@@ -43,8 +51,12 @@ styles.add_style(`
     pointer-events   : none;
     background-color : currentColor;
 }
+:hover > .md-ripple-container:before,
 .md-ripple-container-hovered > .md-ripple-container:before {
-    opacity : .1;
+    opacity : .09;
+}
+:focus > .md-ripple-container:before {
+    opacity : .12;
 }
 .md-ripple {
     opacity          : 0.2;
@@ -65,12 +77,13 @@ styles.add_style(`
     animation : md-ripple-remove ${CSS_DURATION}s cubic-bezier(.25,.8,.25,1);
 }
 `, { "md-utils" : "ripple" });
+*/
 
 class MDRipple {
     constructor ($element, options) {
         this.options    = options;
         this.$element   = $element;
-        this.$container = jqlite('<div class = "md-ripple-container"></div>');
+        this.$container = jqlite('<div class="md-ripple-container"></div>');
         $element.append(this.$container);
 
         const on_mouse_up = () => {
@@ -90,7 +103,9 @@ class MDRipple {
         });
 
 		$element.on("mousedown", event => {
-            event.stopPropagation();
+            // TODO: Think about how to propagate better.
+            // It creates tons of problems...
+            //event.stopPropagation();
 
             if (event.srcElement === $element.DOM_element) {
                 this.create_ripple(event.offsetX, event.offsetY);

@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : md_progress_spinner.js
 * Created at  : 2019-12-24
-* Updated at  : 2019-12-24
+* Updated at  : 2020-06-07
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -69,7 +69,10 @@ md-progress-spinner.indeterminate circle {
 
 module.exports = {
 	selector : "md-progress-spinner",
-	template : 'svg > circle[cx="50%" cy="50%"]',
+	template : `
+        { jt }
+        svg > circle[cx="50%" cy="50%"]
+    `,
     style,
 
 	bindings : {

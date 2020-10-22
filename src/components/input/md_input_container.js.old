@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : md_input_container.js
 * Created at  : 2019-07-18
-* Updated at  : 2019-12-29
+* Updated at  : 2020-05-25
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -15,12 +15,14 @@
 
 // ignore:end
 
-const jqlite               = require("@jeefo/jqlite");
-//const Observer             = require("@jeefo/observer");
+//const jqlite               = require("@jeefo/jqlite");
+const Observer             = require("@jeefo/observer");
 const jeefo_template       = require("@jeefo/template");
 const TranscludeController = require("@jeefo/component/transclude_controller");
 const vendor               = require("../services/vendor");
 const menu_service         = require("../services/menu");
+
+const remove_element = (arr, index) => arr.splice(index, 1)[0];
 
 //const prop_observer = Symbol("observer");
 const prop_disabled = Symbol("is-disabled");
@@ -158,19 +160,26 @@ const init_select = ($element, $select, ctrl) => {
     });
 };
 
-const create_editable = ($element, $textarea) => {
-    const $input = jqlite('<div class="md-input" contenteditable></div>');
-    $textarea.style("display", "none");
-    $textarea.before($input);
+const on_change_contenteditable = ($element, $input) => {
+    if ($input.text) {
+        $element.add_class("activated");
+    } else {
+        $element.remove_class("activated");
+    }
+};
 
-    listen_focus_event_handlers($element, $input);
-    $input.on("input", () => {
-        $textarea.value = $input.text;
-        on_change($element, $textarea);
+const init_textarea = ($element, $textarea) => {
+    listen_focus_event_handlers($element, $textarea);
+    $textarea.on("paste", event => {
+        event.preventDefault();
+
+        const text = event.clipboardData.getData("text/plain");
+        document.execCommand("insertText", false, text);
     });
-    on_change($element, $textarea);
-
-    return $input;
+    $textarea.on("input", () => {
+        on_change_contenteditable($element, $textarea);
+    });
+    on_change_contenteditable($element, $textarea);
 };
 
 const style = `
@@ -183,6 +192,7 @@ md-input-container {
 }
 md-input-container label {
     top         : 50%;
+    left        : 4px;
     overflow    : hidden;
     position    : absolute;
     max-width   : calc(100% - 8px);
@@ -196,6 +206,21 @@ md-input-container.activated label {
     top       : 0;
     font-size : 12px;
 }
+md-input-container .md-notch-wrapper {
+    position: relative;
+}
+
+/* helper text */
+md-input-container .md-input-helper-text {
+    margin    : 0 16px;
+    font-size : 12px;
+}
+md-input-container .md-input-helper-text:before {
+    height  : 16px;
+    content : '';
+    display : inline-block;
+}
+
 md-input-container .md-input-wrapper {
     width    : 100%;
     height   : 100%;
@@ -209,6 +234,7 @@ md-input-container .md-input {
     display          : block;
     font-size        : 16px;
     min-width        : 214px;
+    min-height       : 56px;
     box-sizing       : border-box;
     font-family      : Roboto;
     line-height      : 20px;
@@ -367,7 +393,6 @@ md-input-container.md-input-outlined .md-input-notch-body-top-line {
 md-input-container.md-input-outlined.focused   label,
 md-input-container.md-input-outlined.activated label {
     top       : 0;
-    left      : 4px;
     max-width : calc(100% - 8px);
 }
 md-input-container.md-input-outlined .md-input-notch-head,
@@ -396,6 +421,8 @@ md-input-container.md-block {
 }
 `;
 
+const _notch_wrapper = jeefo_template.parse(`.md-notch-wrapper`)[0];
+
 const template_nodes = jeefo_template.parse(`
 { jt }
 jfContent[select="label"] +
@@ -404,6 +431,7 @@ jfContent[select="md-icon"] +
     jfContent[select="input"] +
     jfContent[select="select"] +
     jfContent[select="textarea"] ^
+jfContent[select="helper-text"]
 `);
 const transluder = new TranscludeController(template_nodes);
 
@@ -436,7 +464,24 @@ module.exports = {
     style,
 
     template : node => {
-        const has_select = node.children.find(n => n.name === "select");
+        let has_select = false;
+        const helper_nodes = [];
+
+        let i = node.children.length;
+        while (i--) {
+            switch (node.children[i].name) {
+                case "select" :
+                    has_select = true;
+                    break;
+                case "helper-text" :
+                    const helper = remove_element(node.children, i);
+                    helper.name = "div";
+                    helper.class_list.push("md-input-helper-text");
+                    helper_nodes.push(helper);
+                    break;
+            }
+        }
+
         const icon_index = node.children.findIndex(n => n.name === "md-icon");
 
         if (icon_index >= 0) {
@@ -468,6 +513,23 @@ module.exports = {
         }
 
         node.children = transluder.transclude(node.children);
+
+        const input_wrapper = node.children.find(child => {
+            return child.class_list[0] === "md-input-wrapper";
+        });
+
+        if (input_wrapper.children.length > 1) {
+            throw new Error("MDInputContainer has more than 1 input elements");
+        }
+        const input = input_wrapper.children[0];
+        if (input && input.name === "textarea") {
+            input.name = "div";
+            input.attrs.set("contenteditable", "true");
+        }
+        if (! input.class_list.includes("md-input")) {
+            input.class_list.unshift("md-input");
+        }
+
         const appearance        = node.attrs.get("appearance");
         const has_class_outline = node.class_list.includes("md-input-outlined");
         const is_outlined = (
@@ -483,7 +545,7 @@ module.exports = {
             const notch = notch_node.clone(true);
             const index = node.children.findIndex(n => n.name === "label");
             if (index >= 0) {
-                const label = node.children.splice(index, 1)[0];
+                const label = remove_element(node.children, index);
                 notch.children[1].children.push(label);
             }
             node.children.unshift(notch);
@@ -495,6 +557,11 @@ module.exports = {
         if (has_select) {
             input_overlay.forEach(n => node.children.push(n.clone(true)));
         }
+
+        // final step
+        const notch_wrapper = _notch_wrapper.clone();
+        notch_wrapper.children = node.children;
+        node.children = [notch_wrapper].concat(helper_nodes);
     },
 
     bindings : {
@@ -515,7 +582,6 @@ module.exports = {
             }
 
             const $input = $input_wrapper.children(0);
-            $input.add_class("md-input");
 
             $element.once("renderable", () => {
                 let $editable;
@@ -523,8 +589,8 @@ module.exports = {
                     case "INPUT" :
                         init_input($element, $input);
                         break;
-                    case "TEXTAREA" :
-                        $editable = create_editable($element, $input);
+                    case "DIV" :
+                        init_textarea($element, $input);
                         break;
                     case "SELECT" :
                         init_select($element, $input, this);
@@ -545,6 +611,25 @@ module.exports = {
                     if ($editable) {
                         model.connect($editable);
                     }
+                }
+            });
+
+            const observer = new Observer(this);
+            observer.on(prop_disabled, is_disabled => {
+                if (is_disabled) {
+                    if ($input.name === "DIV") {
+                        $input.remove_attr("contenteditable");
+                    } else {
+                        $input.set_attr("disabled");
+                    }
+                    $element.add_class("disabled");
+                } else {
+                    if ($input.name === "DIV") {
+                        $input.set_attr("contenteditable");
+                    } else {
+                        $input.remove_attr("disabled");
+                    }
+                    $element.remove_class("disabled");
                 }
             });
 

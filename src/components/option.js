@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : option.js
 * Created at  : 2019-10-07
-* Updated at  : 2019-10-16
+* Updated at  : 2020-06-12
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -27,14 +27,14 @@ module.exports = {
     controller ($element) {
         const observer = new Observer(this);
 
+        if (this.isSelected) {
+            $element.DOM_element.selected = true;
+        }
+
         observer.on("isSelected", is_selected => {
             if (is_selected) {
                 $element.DOM_element.selected = true;
             }
-        });
-
-        $element.once("renderable", () => {
-            $element.trigger("option_added", { bubbles : true });
         });
     }
 };

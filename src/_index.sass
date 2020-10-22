@@ -1,0 +1,15 @@
+
+@import 'sass/size'
+@import 'sass/flex'
+@import 'sass/position'
+
+$theme-modifiers: primary, secondary, error
+
+=property-template ($properties...)
+    content: "props:[#{$properties}]"
+
+=theme-modifiers ($root, $modifiers: $theme-modifiers)
+    @each $modifier in $modifiers
+        &#{$root}--#{$modifier}
+            @content
+

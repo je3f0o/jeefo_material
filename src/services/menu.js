@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : menu.js
 * Created at  : 2019-10-08
-* Updated at  : 2019-12-22
+* Updated at  : 2020-06-09
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -94,7 +94,7 @@ class MDMenuService {
 
         const elements = await compile(template_node, root);
         document.body.appendChild(elements[0]);
-        root.children.forEach(child => child.trigger_renderable());
+        root.children.forEach(child => child.render());
 
         return new Promise(resolve => {
             release = (value = null) => {

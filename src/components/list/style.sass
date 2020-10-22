@@ -1,0 +1,45 @@
+
+@import '../general'
+
+.md-list
+    $root: #{&}
+
+    display: block
+    padding: 8px 0
+
+    &__item
+        height   : 48px
+        cursor   : pointer
+        padding  : 0 16px
+        overflow : hidden
+        position : relative
+
+        &:focus
+            outline: none
+
+        &__text
+            overflow      : hidden
+            white-space   : nowrap
+            text-overflow : ellipsis
+
+    &--has-leading-icon
+        padding-left: 24px
+
+        & #{$root}__item
+            padding-left: 68px
+
+
+    // Theme
+    &__item--selected
+        .md-ripple:before
+            background-color: $primary-color
+
+        &:not(:focus):not(:hover) .md-ripple:before
+            opacity : 0.06
+
+
+
+
+
+
+

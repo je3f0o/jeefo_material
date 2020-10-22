@@ -1,0 +1,303 @@
+
+@import '../general'
+
+%background
+    background-color: #121212
+
+%background-surface
+    background-color: rgba(white, 0.09)
+
+%background-surface--activated
+    background-color: rgba(white, 0.12)
+
+.md-input
+    $root  : #{&}
+    $notch : #{$root}__notch
+
+    $label-align : 16px
+    $input-margin-from-icon: 12px
+
+    $line-height      : 19px
+    $text-caption-size: 12px
+
+    $left-align       : 16px
+    $right-align      : 12px
+    $label-padding    : 4px
+    $border-radius    : 4px
+    $helper-baseline  : 16px
+    $notch-side-width : 12px
+
+    $icon-width       : 24px
+    $icon-box-width   : $icon-width + $label-align + $input-margin-from-icon
+
+    +rel
+    width          : 100%
+    display        : inline-block
+    box-sizing     : border-box
+    vertical-align : middle
+
+    &__label
+        +abs($top: 50%, $left: 16px)
+        overflow    : hidden
+        max-width   : calc(100% - #{$left-align + $right-align + $label-padding})
+        font-size   : 16px
+        transform   : translateY(-50%)
+        transition  : left .25s, top .25s, transform .25s, color .25s, font-size .25s
+        white-space : nowrap
+
+        #{$root}--focused &,
+        #{$root}--activated &
+            top       : 0
+            left      : 16px
+            font-size : $text-caption-size
+
+    &__helper-text
+        margin    : 0 $right-align 0 $left-align
+        font-size : $text-caption-size
+        &:before
+            height  : $helper-baseline
+            content : ''
+            display : inline-block
+
+    &__wrapper
+        +rel
+        +size(100%)
+        overflow : hidden
+
+    &__target
+        color       : currentColor
+        width       : 100%
+        border      : none
+        display     : block
+        min-height  : 56px
+        box-sizing  : border-box
+        line-height : $line-height
+        font:
+            size   : 16px
+            family : Roboto
+        &:focus
+            outline: none
+
+    select#{&}__target
+        color  : transparent
+        cursor : pointer
+        /*! vendor.prefix("appearance", "none") */
+
+    &__overlay
+        +size(100%)
+        +abs($top: 0, $left: 0)
+        box-sizing     : border-box
+        pointer-events : none
+        &__value
+            +truncate
+        &__caret
+            +abs($top: 50%, $right: 10px)
+            transform  : translateY(-50%)
+            transition : transform .25s
+            #{$root}--opened &
+                transform: translateY(-50%) rotateZ(180deg)
+
+    &__list-wrapper
+        +abs
+        width      : 100%
+        opacity    : 1
+        z-index    : 1
+        display    : none
+        transform  : scale(1)
+        transition : opacity .25s, transform .12s cubic-bezier(0,0,0.2,1)
+        overflow-y : auto
+        //box-sizing : border-box
+
+        #{$root}--opened &
+            display: block
+
+    // Notch
+    &__notch-wrapper
+        +rel
+
+    &__notch
+        +abs
+        +size(100%)
+        display    : flex
+        transition : color .25s
+        &__head, &__tail
+            width      : $notch-side-width
+            box-sizing : border-box
+        &__body
+            width     : 100%
+            display   : flex
+            max-width : calc(100% - #{$notch-side-width * 2})
+
+    &--filled
+        #{$root}__target
+            padding       : 25px 16px (56px - 25px - $line-height)
+            transition    : background-color 0.25s
+            border-radius : 4px 4px 0 0
+
+        #{$root}__overlay
+            padding : 25px 40px (56px - 25px - $line-height) 16px
+
+        #{$root}__wrapper
+            &:before, &:after
+                +abs($bottom: 0)
+                width   : 100%
+                content : ''
+            &:before
+                border-bottom : 1px solid
+            &:after
+                transform     : scaleX(0)
+                transition    : transform .25s cubic-bezier(.4, 0, .2, 1)
+                border-bottom : 2px solid
+
+    &--outlined
+        #{$root}__target
+            padding: 19px 16px (56px - 19px - $line-height)
+        #{$root}__overlay
+            padding : 19px 40px (56px - 19px - $line-height) 16px
+
+        #{$notch}__head
+            border        : 1px solid
+            border-right  : none
+            border-radius : $border-radius 0 0 $border-radius
+        #{$notch}__tail
+            border        : 1px solid
+            border-left   : none
+            border-radius : 0 $border-radius $border-radius 0
+        #{$notch}__body
+            border-bottom : 1px solid
+
+            &__content
+                +rel
+                box-sizing : border-box
+
+                &:before, &:after
+                    +abs
+                    width      : 50%
+                    content    : ''
+                    display    : block
+                    border-top : 1px solid
+                    transition : width .25s, border-top-color .25s
+                &:after
+                    right : 0
+
+            &__space-filler
+                flex-grow  : 1
+                border-top : 1px solid
+
+        &:hover,
+        &#{$root}--focused
+            #{$notch}__head,
+            #{$notch}__tail,
+            #{$notch}__body,
+            #{$notch}__body__content:before,
+            #{$notch}__body__content:after,
+            #{$notch}__body__space-filler
+                border-width: 2px
+
+    &--focused,
+    &--activated
+        &#{$root}--filled
+            #{$root}__label
+                transform : none
+                /** debug
+                    background-color : red
+                    height           : 40px
+                    width            : 100%
+                    display          : block
+                    */
+                &:before
+                    height  : 20px
+                    content : ''
+                    display : inline-block
+
+        &#{$root}--outlined
+            #{$notch}__body
+                &__content
+                    &:before, &:after
+                        width: 0
+
+
+
+    &--with-leading-icon
+        #{$root}__leading-icon
+            +abs($left: $label-align, $top: 16px)
+    &--with-trailing-icon
+        #{$root}__trailing-icon
+            +abs($right: $label-align, $top: 16px)
+
+    &--with-leading-button
+        #{$root}__leading-button
+            +abs($left: $label-align, $top: 8px)
+    &--with-trailing-button
+        #{$root}__trailing-button
+            +abs($right: 8px, $top: 8px)
+
+
+    &--with-leading-icon,
+    &--with-leading-button
+        &:not(.md-input--focused):not(.md-input--activated)
+            &:not(.md-input--with-trailing-icon),
+            &:not(.md-input--with-trailing-button)
+                #{$root}__label
+                    max-width: calc(100% - #{$icon-box-width + $label-align})
+            &.md-input--with-trailing-icon,
+            &.md-input--with-trailing-button
+                #{$root}__label
+                    max-width: calc(100% - #{$icon-box-width * 2})
+
+            #{$root}__label
+                left: $icon-box-width
+
+        #{$root}__target
+            padding-left: $icon-box-width
+
+    &--with-trailing-icon,
+    &--with-trailing-button
+        #{$root}__target
+            padding-right: $icon-box-width
+
+    // ===============================
+    // theme
+    // ===============================
+    &--filled
+        & #{$root}__notch-wrapper
+            @extend %background
+
+        & #{$root}__target
+            @extend %background-surface
+            &:hover
+                @extend %background-surface--activated
+
+        &#{$root}--focused #{$root}__target
+            @extend %background-surface--activated
+
+    &--outlined
+        & #{$root}__target
+            background-color: transparent
+
+    // Select
+    &__list-wrapper
+        @extend %background
+    md-list
+        @extend %background-surface--activated
+
+    // Modifiers
+    &--focused
+        & #{$root}__target
+            @extend %background-surface--activated
+
+        &#{$root}--filled
+            #{$root}__label,
+            #{$root}__wrapper:after
+                color: $primary-color
+
+            #{$root}__wrapper:after
+                transform : scaleX(1)
+
+        &#{$root}--outlined
+            #{$root}__notch
+                color: $primary-color
+
+        #{$root}__overlay__caret
+            color: $primary-color
+
