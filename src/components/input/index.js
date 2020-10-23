@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : index.js
 * Created at  : 2019-07-18
-* Updated at  : 2020-08-14
+* Updated at  : 2020-10-23
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -16,8 +16,8 @@
 // ignore:end
 
 const jqlite               = require("@jeefo/jqlite");
+const JeefoDOMParser       = require("@jeefo/jqlite/dom_parser");
 const Observer             = require("@jeefo/observer");
-const JeefoDOMParser       = require("@jeefo/component/dom_parser");
 const TranscludeController = require("@jeefo/component/transclude_controller");
 const vendor               = require("../../services/vendor"); // jshint ignore:line
 //const menu_service         = require("../../services/menu");

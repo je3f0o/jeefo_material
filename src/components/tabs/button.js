@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : button.js
 * Created at  : 2019-07-05
-* Updated at  : 2020-06-25
+* Updated at  : 2020-10-23
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -15,7 +15,7 @@
 
 // ignore:end
 
-const jeefoDOMParser = require("@jeefo/component/dom_parser");
+const jeefoDOMParser = require("@jeefo/jqlite/dom_parser");
 
 const button = jeefoDOMParser.parse(`
 {jt}

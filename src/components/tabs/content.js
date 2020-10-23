@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : content.js
 * Created at  : 2019-07-05
-* Updated at  : 2020-06-25
+* Updated at  : 2020-10-23
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -15,7 +15,7 @@
 
 // ignore:end
 
-const JeefoDOMParser = require("@jeefo/component/dom_parser");
+const JeefoDOMParser = require("@jeefo/jqlite/dom_parser");
 
 const content = JeefoDOMParser.parse(`{jt} div`)[0];
 
