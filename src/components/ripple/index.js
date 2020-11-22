@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : index.js
 * Created at  : 2020-06-23
-* Updated at  : 2020-10-21
+* Updated at  : 2020-10-27
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -80,6 +80,7 @@ module.exports = {
 
                 const {transitionDuration} = getComputedStyle(active_ripple);
                 setTimeout(() => {
+                    if (! $element.DOM_element) return;
                     if (ripple.is_removable) {
                         $element.DOM_element.removeChild(ripple);
                     } else {

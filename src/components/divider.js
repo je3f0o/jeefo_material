@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : divider.js
 * Created at  : 2020-10-18
-* Updated at  : 2020-10-18
+* Updated at  : 2020-11-18
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -46,7 +46,6 @@ exports.bindings = {
 
 exports.controller = class MDDivider {
     on_init ($element) {
-        console.log("Hello ????");
         $element.add_class("md-divider");
 
         if (typeof this.orientation === "string") {

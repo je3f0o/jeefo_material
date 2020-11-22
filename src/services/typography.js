@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : typography.js
 * Created at  : 2019-10-07
-* Updated at  : 2020-05-25
+* Updated at  : 2020-10-31
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -151,14 +151,6 @@ class MDTypography {
                     weight : "regular",
                 },
                 letter_spacing : 0.25,
-            },
-            ".md-button" : {
-                font : {
-                    size   : "14px",
-                    weight : "medium",
-                },
-                letter_spacing   : 1.25,
-                "text-transform" : "uppercase",
             },
             ".md-caption" : {
                 font : {

@@ -1,5 +1,5 @@
 
-=pos ($position, $top: null, $right: null, $bottom: null, $left: null)
+=pos ($position, $top: null, $right: null, $bottom: null, $left: null, $all: null)
     position: $position
     @if $top != null
         top: $top
@@ -9,10 +9,15 @@
         bottom: $bottom
     @if $left != null
         left: $left
+    @if $all != null
+        top    : $all
+        left   : $all
+        right  : $all
+        bottom : $all
 
-=fix ($top: null, $right: null, $bottom: null, $left: null)
-    +pos(fixed, $top, $right, $bottom, $left)
-=abs ($top: null, $right: null, $bottom: null, $left: null)
-    +pos(absolute, $top, $right, $bottom, $left)
-=rel ($top: null, $right: null, $bottom: null, $left: null)
-    +pos(relative, $top, $right, $bottom, $left)
+=fix ($top: null, $right: null, $bottom: null, $left: null, $all: null)
+    +pos(fixed, $top, $right, $bottom, $left, $all)
+=abs ($top: null, $right: null, $bottom: null, $left: null, $all: null)
+    +pos(absolute, $top, $right, $bottom, $left, $all)
+=rel ($top: null, $right: null, $bottom: null, $left: null, $all: null)
+    +pos(relative, $top, $right, $bottom, $left, $all)

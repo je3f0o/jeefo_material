@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : index.js
 * Created at  : 2020-10-08
-* Updated at  : 2020-10-19
+* Updated at  : 2020-10-31
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -170,16 +170,24 @@ module.exports = {
     style,
 
     template : element => {
+        const typography = JeefoDOMParser.parse(`{jt}
+            mdTypography[variant="button"]
+        `)[0];
+        while (element.firstChild) {
+            typography.appendChild(element.firstChild);
+        }
+
         if (element.hasAttribute("href")) {
-            const anchor = document.createElement("a");
+            const anchor = JeefoDOMParser.parse(`{jt}a`)[0];
             element = JeefoDOMParser.replace(element, anchor);
         } else {
-            const button = document.createElement("button");
+            const button = JeefoDOMParser.parse(`{jt}button`)[0];
             button.setAttribute("type", "button");
             element = JeefoDOMParser.replace(element, button);
 		}
 
 		element.classList.add("md-button");
+        element.appendChild(typography);
 		element.appendChild(ripple.cloneNode());
         return element;
     },

@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : index.js
 * Created at  : 2019-07-18
-* Updated at  : 2020-10-23
+* Updated at  : 2020-10-31
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -19,6 +19,8 @@ const jqlite               = require("@jeefo/jqlite");
 const JeefoDOMParser       = require("@jeefo/jqlite/dom_parser");
 const Observer             = require("@jeefo/observer");
 const TranscludeController = require("@jeefo/component/transclude_controller");
+const md_theme             = require("@jeefo/material/services/theme");
+const class_modifier       = require("@jeefo/material/utils/class_modifier");
 const vendor               = require("../../services/vendor"); // jshint ignore:line
 //const menu_service         = require("../../services/menu");
 //const MDRipple             = require("../../utils/ripple");
@@ -252,12 +254,12 @@ const transluder = new TranscludeController(`
             jfContent[select="label"] ^
         .md-input__notch__tail ^
     .md-input__wrapper >
-        jfContent[select="input"] +
-        jfContent[select="select"] +
-        jfContent[select="textarea"]
-    ^   ^
-jfContent[select="md-icon"] +
-jfContent[select="md-button"]
+        .md-input__foreground >
+            jfContent.md-input__target[select="input"] +
+            jfContent.md-input__target[select="select"] +
+            jfContent.md-input__target[select="textarea"] +
+            jfContent[select="md-icon"] +
+            jfContent[select="md-button"]
 `);
 
 const select_nodes = JeefoDOMParser.parse(`
@@ -314,14 +316,316 @@ const leading_or_trailing = (parent_el, child_el, is_input_passed) => {
     }
 };
 
+const style = `
+/* sass */
+@import '@jeefo/material'
+
+.md-input
+    $root  : &
+    $notch : #{$root}__notch
+
+    $label-align : 16px
+    $input-margin-from-icon: 12px
+
+    $line-height      : 19px
+    $text-caption-size: 12px
+
+    $left-align       : 16px
+    $right-align      : 12px
+    $label-padding    : 4px
+    $border-radius    : 4px
+    $helper-baseline  : 16px
+    $notch-side-width : 12px
+
+    $icon-width       : 24px
+    $icon-box-width   : $icon-width + $label-align + $input-margin-from-icon
+
+    +rel
+    width          : 100%
+    display        : inline-block
+    box-sizing     : border-box
+    vertical-align : middle
+
+    .md-icon
+        pointer-events: none
+
+    &__label
+        +abs($top: 50%, $left: 16px)
+        overflow    : hidden
+        max-width   : calc(100% - #{$left-align + $right-align + $label-padding})
+        font-size   : 16px
+        transform   : translateY(-50%)
+        transition  : left .25s, top .25s, transform .25s, color .25s, font-size .25s
+        white-space : nowrap
+
+        #{$root}--focused &,
+        #{$root}--activated &
+            top       : 0
+            left      : 16px
+            font-size : $text-caption-size
+
+    &__helper-text
+        display    : block
+        padding    : 0 $right-align 0 $left-align
+        font-size  : $text-caption-size
+        text-align : left
+        box-sizing : border-box
+
+        &:before
+            height  : $helper-baseline
+            content : ''
+            display : inline-block
+
+    &__wrapper
+        +rel
+        +size(100%)
+        overflow : hidden
+
+    &__target
+        color       : currentColor
+        width       : 100%
+        border      : none
+        display     : block
+        min-height  : 56px
+        box-sizing  : border-box
+        line-height : $line-height
+
+        font:
+            size   : 16px
+            family : Roboto
+        &:focus
+            outline: none
+
+    select#{&}__target
+        color  : transparent
+        cursor : pointer
+        /*! vendor.prefix("appearance", "none") */
+
+    &__overlay
+        +size(100%)
+        +abs($top: 0, $left: 0)
+        box-sizing     : border-box
+        pointer-events : none
+        &__value
+            +truncate
+        &__caret
+            +abs($top: 50%, $right: 10px)
+            transform  : translateY(-50%)
+            transition : transform .25s
+            #{$root}--opened &
+                transform: translateY(-50%) rotateZ(180deg)
+
+    &__list-wrapper
+        +abs
+        width      : 100%
+        opacity    : 1
+        z-index    : 1
+        display    : none
+        transform  : scale(1)
+        transition : opacity .25s, transform .12s cubic-bezier(0,0,0.2,1)
+        overflow-y : auto
+        //box-sizing : border-box
+
+        #{$root}--opened &
+            display: block
+
+    // Notch
+    &__notch-wrapper
+        +rel
+
+    &__notch
+        +abs
+        +size(100%)
+        display    : flex
+        transition : color .25s
+        &__head, &__tail
+            width      : $notch-side-width
+            box-sizing : border-box
+        &__body
+            width     : 100%
+            display   : flex
+            max-width : calc(100% - #{$notch-side-width * 2})
+
+    &--filled
+        #{$root}__notch-wrapper, #{$root}__target
+            border-radius : 4px 4px 0 0
+
+        #{$root}__target
+            padding    : 25px 16px (56px - 25px - $line-height)
+            transition : background-color 0.25s
+
+        #{$root}__overlay
+            padding : 25px 40px (56px - 25px - $line-height) 16px
+
+        #{$root}__wrapper
+            &:before, &:after
+                +abs($left: 0, $bottom: 0)
+                width   : 100%
+                content : ''
+                border-bottom : solid currentColor
+            &:before
+                border-width : 1px
+            &:after
+                transform    : scaleX(0)
+                transition   : transform .25s cubic-bezier(.4, 0, .2, 1)
+                border-width : 2px
+
+        #{$root}__label:before
+            height     : 0
+            content    : ''
+            display    : inline-block
+            transition : height .25s
+
+        &#{$root}--focused,
+        &#{$root}--activated
+            #{$root}__label
+                transform : none
+                &:before
+                    height: 20px
+            #{$root}__wrapper:after
+                transform: scaleX(1)
+
+    &--outlined
+        #{$root}__target
+            padding          : 19px 16px (56px - 19px - $line-height)
+            background-color : transparent
+        #{$root}__overlay
+            padding : 19px 40px (56px - 19px - $line-height) 16px
+
+        #{$notch}__head
+            border        : 1px solid
+            border-right  : none
+            border-radius : $border-radius 0 0 $border-radius
+        #{$notch}__tail
+            border        : 1px solid
+            border-left   : none
+            border-radius : 0 $border-radius $border-radius 0
+        #{$notch}__body
+            border-bottom : 1px solid
+
+            &__content
+                +rel
+                box-sizing : border-box
+
+                &:before, &:after
+                    +abs
+                    width      : 50%
+                    content    : ''
+                    display    : block
+                    border-top : 1px solid
+                    transition : width .25s, border-top-color .25s
+                &:after
+                    right : 0
+
+            &__space-filler
+                flex-grow  : 1
+                border-top : 1px solid
+
+        &:hover,
+        &#{$root}--focused
+            #{$notch}__head,
+            #{$notch}__tail,
+            #{$notch}__body,
+            #{$notch}__body__content:before,
+            #{$notch}__body__content:after,
+            #{$notch}__body__space-filler
+                border-width: 2px
+
+        &#{$root}--focused,
+        &#{$root}--activated
+            #{$root}__label
+                left: $left-align
+            #{$notch}__body
+                &__content
+                    &:before, &:after
+                        width: 0
+
+
+
+    &--with-leading-icon
+        #{$root}__leading-icon
+            +abs($left: $label-align, $top: 16px)
+    &--with-trailing-icon
+        #{$root}__trailing-icon
+            +abs($right: $label-align, $top: 16px)
+
+    &--with-leading-button
+        #{$root}__leading-button
+            +abs($left: $label-align, $top: 8px)
+    &--with-trailing-button
+        #{$root}__trailing-button
+            +abs($right: 8px, $top: 8px)
+
+
+    &--with-leading-icon,
+    &--with-leading-button
+        &:not(.md-input--focused):not(.md-input--activated)
+            &:not(.md-input--with-trailing-icon),
+            &:not(.md-input--with-trailing-button)
+                #{$root}__label
+                    max-width: calc(100% - #{$icon-box-width + $label-align})
+            &.md-input--with-trailing-icon,
+            &.md-input--with-trailing-button
+                #{$root}__label
+                    max-width: calc(100% - #{$icon-box-width * 2})
+
+        #{$root}__label
+            left: $icon-box-width
+
+        #{$root}__target
+            padding-left: $icon-box-width
+
+    &--with-trailing-icon,
+    &--with-trailing-button
+        #{$root}__target
+            padding-right: $icon-box-width
+
+    // ===============================
+    // theme
+    // ===============================
+
+    // Select
+    //&__list-wrapper
+        @extend %background
+    //md-list
+        @extend %background-surface--activated
+`;
+
+md_theme.register_template(`
+/* sass */
+@import '@jeefo/material'
+
+.md-input
+    $root: &
+
+    #{$root}__foreground
+        +property-template(color)
+
+    +theme-modifiers($root, (primary, secondary))
+        &#{$root}--focused
+            +property-template(color)
+
+    +theme-modifiers($root, (error))
+        +property-template(color)
+
+    &--filled
+        & #{$root}__input-wrapper
+            +property-template(background-color)
+
+        & #{$root}__target
+            +property-template(background-color)
+            &:hover
+                +property-template(background-color)
+
+        &#{$root}--focused #{$root}__target
+            +property-template(background-color)
+
+`);
+
 module.exports = {
     selector : "md-input-container",
 
-    dependencies : {
-        form : "?form"
-    },
-
-    style : "#include style.sass",
+    style,
 
     template : element => {
         const helper_text_elems = [];
@@ -355,21 +659,22 @@ module.exports = {
         const label = element.querySelector(".md-input__notch__body > label");
         if (label) label.classList.add("md-input__label");
 
-        const input_wrapper = element.children[0].children[1];
-        if (input_wrapper.children.length !== 1) {
+        const foreground = element.querySelector(".md-input__foreground");
+        const inputs     = foreground.querySelectorAll(".md-input__target");
+        if (inputs.length !== 1) {
             throw new Error("MDInput element length is not valid");
         }
-        let input = input_wrapper.children[0];
+        let input = inputs[0];
         if (input) {
             switch (input.tagName) {
                 case "SELECT" :
-                    input_wrapper.appendChild(select_nodes[0].cloneNode(true));
+                    foreground.appendChild(select_nodes[0].cloneNode(true));
                     element.appendChild(select_nodes[1].cloneNode(true));
                     break;
                 case "TEXTAREA" :
                     const editable = editable_div.cloneNode();
                     replace_element(input, editable);
-                    input_wrapper.replaceChild(editable, input);
+                    foreground.replaceChild(editable, input);
                     input = editable;
                     break;
             }
@@ -484,6 +789,7 @@ module.exports = {
     },
 
     bindings : {
+        color           : '@',
         [prop_disabled] : "<isDisabled",
         ["on_open"]     : "<onOpen",
     },
@@ -544,23 +850,6 @@ module.exports = {
                     );
             }
 
-            $element.once("render", () => {
-                //let $editable;
-                const model_name = $input.get_attr("name");
-                const model = (
-                    model_name && this.form &&
-                    this.form.__form_data.models[model_name]
-                );
-                if (model) {
-                    this[model_name] = model;
-                    /*
-                    if ($editable) {
-                        model.connect($editable);
-                    }
-                    */
-                }
-            });
-
             const observer = new Observer(this);
             observer.on(prop_disabled, is_disabled => {
                 if (is_disabled) {
@@ -579,6 +868,15 @@ module.exports = {
                     $element.remove_class(modifier_class.disabled);
                 }
             });
+
+            if (typeof this.color === "string") {
+                const modifiers = ["primary", "secondary", "error"];
+                const on_color_change = class_modifier(
+                    $element.DOM_element, "md-input", modifiers
+                );
+                observer.on("color", v => on_color_change(v.toLowerCase()));
+                on_color_change(this.color.toLowerCase());
+            }
 
             /*
             let $placeholder, $replacement;
