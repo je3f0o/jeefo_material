@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : media.js
 * Created at  : 2019-10-06
-* Updated at  : 2019-10-06
+* Updated at  : 2021-01-24
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -20,9 +20,9 @@ const EventEmiiter = require("@jeefo/utils/event_emitter");
 const get_breakpoint = width => {
     if (width >= 1920) {
         return "xl";
-    } else if (width >= 1280) {
+    } else if (width >= 1440) {
         return "lg";
-    } else if (width >= 960) {
+    } else if (width >= 1024) {
         return "md";
     } else if (width >= 600) {
         return "sm";
@@ -35,7 +35,7 @@ class MDMediaService extends EventEmiiter {
         super();
         window.addEventListener("resize", () => {
             const breakpoint = get_breakpoint(window.innerWidth);
-            if (breakpoint !== this.breakpoint) {
+            if (this.breakpoint !== breakpoint) {
                 this.breakpoint = breakpoint;
                 this.emit("breakpoint_changed", breakpoint);
             }
@@ -51,11 +51,17 @@ class MDMediaService extends EventEmiiter {
             case "gt-xs" :
                 return this.breakpoint !== "xs";
             case "gt-sm" :
-                return ["sm", "lg", "xl"].includes(this.breakpoint);
+                return ["md", "lg", "xl"].includes(this.breakpoint);
+            case "gte-sm" :
+                return ["sm", "md", "lg", "xl"].includes(this.breakpoint);
             case "gt-md" :
                 return ["lg", "xl"].includes(this.breakpoint);
+            case "gte-md" :
+                return ["md", "lg", "xl"].includes(this.breakpoint);
             case "gt-lg" :
                 return this.breakpoint === "xl";
+            case "gte-lg" :
+                return ["lg", "xl"].includes(this.breakpoint);
         }
     }
 }

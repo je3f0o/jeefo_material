@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : color.js
 * Created at  : 2020-05-24
-* Updated at  : 2020-05-25
+* Updated at  : 2021-02-27
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -15,7 +15,9 @@
 
 // ignore:end
 
-const { isInteger }                     = Number;
+const is_number = require("@jeefo/utils/is/number");
+
+const {isInteger}                       = Number;
 const {min: min_fn, max: max_fn, round} = Math;
 
 const REGEX_HEX_SHORT = /^#([a-f\d])([a-f\d])([a-f\d])$/i;
@@ -23,15 +25,11 @@ const REGEX_HEX_LONG  = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i;
 
 const type_error = () => { throw new TypeError("Invalid input"); };
 const validate_args_length = args => {
-    if (args.length < 3) {
-        throw new Error("Missing argument");
-    }
+    if (args.length !== 3) throw new Error("Missing argument");
 };
 
-const is_number = value => typeof value === "number" && ! isNaN(value);
-
 const validate_normalized = value => {
-    if (! is_number(value)) { type_error(); }
+    if (! is_number(value)) type_error();
 
     if (value < 0 || value > 1) {
         throw new RangeError(
@@ -45,19 +43,35 @@ const validate_normalized = value => {
     return value;
 };
 
-const validate_rgb_number = value => {
-    if (! is_number(value)) { type_error(); }
-
-    if (value < 0 || value > 255 || ! isInteger(value)) {
-        throw new RangeError(
-            [
-                "RGB components must be interger numbers between 0 and 255 integers.",
-                `Given value ${value} is not valid.`
-            ].join(' ')
-        );
+const validate_rgb_components = values => {
+    for (const value of values) {
+        if (! is_number(value) || ! isInteger(value)) type_error();
+        if (value < 0 || value > 255) {
+            throw new RangeError(
+                [
+                    "RGB components must be interger numbers in between 0 and 255.",
+                    `Given value ${value} is not valid.`
+                ].join(' ')
+            );
+        }
     }
+};
 
-    return value;
+const parse_values = values => values.split(',').map(v => +(v.trim()));
+
+const parse_rgba = value => {
+    const values = parse_values(value.slice(5, -1));
+    if (values.length !== 4) type_error();
+    validate_rgb_components(values.slice(0, 3));
+    validate_normalized(values[3]);
+    return values;
+};
+
+const parse_rgb = value => {
+    const values = parse_values(value.slice(4, -1));
+    if (values.length !== 3) type_error();
+    validate_rgb_components(values);
+    return values;
 };
 
 /*
@@ -78,16 +92,15 @@ const named_colors = {
 const hex_component = value => value.toString(16).padStart(2, '0');
 
 const hex2rgb = color => {
-    let result;
-    if (color.length === 4) {
-        result = color.match(REGEX_HEX_SHORT);
-    } else {
-        result = color.match(REGEX_HEX_LONG);
-    }
+    const regex  = color.length === 4 ? REGEX_HEX_SHORT : REGEX_HEX_LONG;
+    const result = color.match(regex);
 
-    if (! result) { type_error(); }
+    if (! result) type_error();
     result.shift();
-    return result.map(v => parseInt(v, 16));
+    return result.map(v => {
+        if (v.length === 1) v += v;
+        return parseInt(v, 16);
+    });
 };
 
 const one_over_6 = 1 / 6;
@@ -109,19 +122,21 @@ function _constructor (instance, type_or_color, args) {
     if (type_or_color.startsWith('#')) {
         instance.type   = "rgb";
         instance.values = hex2rgb(type_or_color);
-    } else if (type_or_color.startsWith("rgb")) {
-        if (args.slice(0, 3).every(is_number)) {
-            instance.type   = "rgb";
-            instance.values = args;
-        } else {
-            throw new TypeError("Invalid input");
-        }
+    } else if (type_or_color.startsWith("rgb(")) {
+        const values = parse_rgb(type_or_color);
+        instance.type   = "rgb";
+        instance.values = values;
+    } else if (type_or_color.startsWith("rgba(")) {
+        const values = parse_rgba(type_or_color);
+        instance.type   = "rgba";
+        instance.values = values;
     } else {
         switch (type_or_color) {
             case "rgb" :
                 validate_args_length(args);
+                validate_rgb_components(args);
                 instance.type   = type_or_color;
-                instance.values = args.slice(0, 3).map(validate_rgb_number);
+                instance.values = args;
                 break;
             case "hsl" :
                 validate_args_length(args);
@@ -236,6 +251,10 @@ class Color {
                 this.type   = "rgb";
                 this.values = this.values.map(v => round(v * 255));
                 return this;
+            case "rgba":
+                this.type   = "rgb";
+                this.values = this.values.slice(0, 3);
+                return this;
             default: type_error();
         }
         let r, g, b;
@@ -296,6 +315,28 @@ class Color {
         this.values = [h, s * 100, l * 100];
 
         return this;
+    }
+
+    blend (background, alpha) {
+        if (! (background instanceof Color)) background = new Color(background);
+        if (background.type !== "rgb") background.to_rgb();
+        if (this.type !== "rgb") this.to_rgb();
+
+        for (let i = 0; i < 3; i += 1) {
+            const v = (1 - alpha) * background.values[i] + alpha * this.values[i];
+            this.values[i] = round(v);
+        }
+    }
+
+    static blend (background, foreground, alpha) {
+        const color     = new Color("rgb", 0, 0, 0);
+        const bg_values = background.values;
+        const fg_values = foreground.values;
+        for (let i = 0; i < 3; i += 1) {
+            const v = (1 - alpha) * bg_values[i] + alpha * fg_values[i];
+            color.values[i] = round(v);
+        }
+        return color;
     }
 }
 

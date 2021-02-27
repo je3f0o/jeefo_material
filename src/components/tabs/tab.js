@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : tab.js
 * Created at  : 2019-07-05
-* Updated at  : 2020-07-10
+* Updated at  : 2021-02-25
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -13,11 +13,25 @@
 /* globals*/
 /* exported*/
 
-// jshint curly: false
-
 // ignore:end
 
-const EventEmitter = require("@jeefo/utils/event_emitter");
+const Observer             = require("@jeefo/observer");
+const EventEmitter         = require("@jeefo/utils/event_emitter");
+const TranscludeController = require("@jeefo/component/transclude_controller");
+
+//const button_template = JeefoDOMParser.parse(`
+const transcluder = new TranscludeController(`
+{jt}
+button.md-tabs__button[
+    type       = "button"
+    tabindex   = "-1"
+    mdEmphasis = "{{ $md_tab.is_selected ? '' : 'medium' }}"
+] >
+    mdTypography[variant="button"] >
+        jfContent ^
+    .md-tabs__button__indicator +
+    mdRipple
+`);
 
 const modifier_class = {
     focused   : "md-tabs__button--focus",
@@ -26,8 +40,48 @@ const modifier_class = {
 
 const EXTRA_SPACE = 24;
 
-class MDTabController extends EventEmitter {
+exports.selector = "md-tab";
+
+exports.template = element => {
+    transcluder.transclude(element);
+    const button = element.firstChild;
+    element.removeChild(button);
+
+    for (const attr of element.attributes) {
+        button.setAttribute(attr.name, attr.value);
+    }
+
+    return button;
+};
+
+exports.dependencies = {
+    md_tabs : "mdTabs",
+};
+
+exports.bindings = {
+    is_selected : "=isSelected",
+    is_disabled : "<isDisabled",
+};
+
+exports.controller = class MDTab extends EventEmitter {
     on_init ($element) {
+        const observer  = new Observer(this);
+        const {md_tabs} = this;
+        this.$element   = $element;
+        this.$indicator = $element.first(".md-tabs__button__indicator");
+        md_tabs.tabs.push(this);
+
+        $element.on("click", () => {
+            if (md_tabs.selected !== this) md_tabs.select(this);
+        });
+
+        const on_selected_change = value => {
+            if (value && md_tabs.selected !== this) md_tabs.select(this);
+        };
+        on_selected_change(this.is_selected);
+        observer.on("is_selected", on_selected_change);
+
+        return;
         const el = this.el = $element.DOM_element;
 
         const move_elements = () => {
@@ -74,10 +128,6 @@ class MDTabController extends EventEmitter {
             move_elements();
             if (this.is_activated) this.activate();
         });
-    }
-
-    on_destroy () {
-        this.tabs.remove(this);
     }
 
     activate (user_activated = true) {
@@ -174,22 +224,6 @@ class MDTabController extends EventEmitter {
             }
         }
     }
-}
-
-module.exports = {
-    selector : "md-tab",
-    template : `
-        { jt }
-        jfContent[select="md-tab-button"] +
-        jfContent[select="md-tab-content"]
-    `,
-    dependencies : {
-        tabs : "mdTabs",
-    },
-    bindings : {
-        is_disabled  : "<isDisabled",
-        is_activated : "!isActivated",
-    },
-    controller      : MDTabController,
-    controller_name : "$md_tab"
 };
+
+exports.controller_name = "$md_tab";

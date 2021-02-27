@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : index.js
 * Created at  : 2020-06-23
-* Updated at  : 2020-10-27
+* Updated at  : 2021-02-26
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -22,7 +22,14 @@ const {max, sqrt} = Math;
 
 module.exports = {
     selector : "md-ripple",
-    style : "#include style.sass",
+    style : `
+        /* sass */
+        @import '@jeefo/material'
+        @import './style'
+
+        .md-ripple
+            +ripple
+    `,
     template (element) {
         if (element.firstChild) {
             throw new Error("MDRipple shouldn't contain any child");
@@ -49,7 +56,7 @@ module.exports = {
             $element.on("mouseup"    , on_mouse_up);
             $element.on("mouseleave" , on_mouse_up);
 
-            $element.on("mousedown", event => {
+            const on_mousedown = event => {
                 if (event.button !== 0) { return; }
 
                 let x, y;
@@ -87,7 +94,10 @@ module.exports = {
                         ripple.is_removable = true;
                     }
                 }, parseFloat(transitionDuration) * 1000);
-            });
+            };
+
+            $element.on("mousedown" , on_mousedown);
+            $element.on("touchstart", on_mousedown);
         }
     }
 };

@@ -1,12 +1,17 @@
 
-@import '../general.sass'
+@import '@jeefo/material'
 
-.md-ripple
+$ripple_hover_opacity  : .05
+$ripple_focus_opacity  : .08
+$ripple_active_opacity : .11
+
+=ripple
     $root: #{&}
 
     +size(100%)
     +abs($top: 0, $left: 0)
-    overflow : hidden
+    overflow    : hidden
+    will-change : transform
 
     &:before
         +size(100%)
@@ -18,16 +23,14 @@
         pointer-events   : none
         background-color : currentColor
 
-    :hover > &:before,
-    &--hovered:before
-        opacity: .09
+    :not(:disabled):hover > &:before
+        opacity: $ripple_hover_opacity
 
-    :focus > &:before,
-    &--focused:before
-        opacity: .12
+    :not(:disabled):focus > &:before
+        opacity: $ripple_focus_opacity
 
     &__wave
-        opacity                    : 0.2
+        opacity                    : $ripple_active_opacity
         position                   : absolute
         transform                  : translate(-50%,-50%) scale(0)
         border-radius              : 50%

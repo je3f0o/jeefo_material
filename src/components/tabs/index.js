@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : index.js
 * Created at  : 2019-07-04
-* Updated at  : 2020-06-26
+* Updated at  : 2021-02-26
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -13,15 +13,113 @@
 /* globals*/
 /* exported*/
 
-// jshint curly: false
-
 // ignore:end
-const EventEmitter = require("@jeefo/utils/event_emitter");
 
-const array_remove = require("@jeefo/utils/array/remove");
+const Observer            = require("@jeefo/observer");
+const EventEmitter        = require("@jeefo/utils/event_emitter");
+const array_remove        = require("@jeefo/utils/array/remove");
+const {definitions_table} = require("@jeefo/component");
+const theme_service       = require("../../services/theme");
+const class_modifier      = require("../../utils/class_modifier");
 
-class MDTabsController extends EventEmitter {
+definitions_table.register_component("md-tab", `${__dirname}/tab`);
+
+exports.selector = "md-tabs";
+
+exports.style = `
+/* sass */
+@import '@jeefo/material'
+
+.md-tabs
+    display  : block
+    overflow : hidden
+
+    &__scroll-wrapper
+        overflow       : scroll hidden
+        margin-bottom  : -20px
+        padding-bottom :  20px
+
+    &__scroller
+        display: flex
+
+    &__button
+        +rel
+        +flex-center
+        flex       : 1 0 auto
+        border     : none
+        cursor     : pointer
+        height     : 48px
+        padding    : 0 16px
+        outline    : none
+        background : transparent
+        transition : color .25s ease
+
+        &--selected &__indicator
+            +abs($bottom: 0)
+            +size(100%, 2px)
+            transition    : transform .25s cubic-bezier(.4, 0, .2, 1)
+            border-bottom : 2px solid currentColor
+`;
+
+theme_service.set_default({
+    ".md-tabs__button": {
+        "color": "rgba($on_surface-color, .38)",
+    },
+    ".md-tabs__button--selected": {
+        "color": "$primary-color"
+    },
+});
+
+theme_service.register_template(`
+/* sass */
+@import '@jeefo/material'
+
+.md-tabs
+    &__button
+        +property-template(color)
+        &--selected
+            +property-template(color)
+`);
+
+exports.template = `
+{jt}
+.md-tabs__scroll-wrapper >
+    .md-tabs__scroller >
+        jfContent[select="md-tab"]
+`;
+
+exports.bindings = {
+    index: '=',
+    color: '@',
+};
+
+exports.controller = class MDTabs extends EventEmitter {
     on_init ($element) {
+        $element.add_class("md-tabs");
+        this.tabs     = [];
+        this.selected = null;
+        this.$element = $element;
+
+        $element.on("initialized", () => {
+            if (! this.selected && this.tabs.length) {
+                this.select(this.tabs[0]);
+            }
+            this.initialized = true;
+        });
+
+        const name          = "md-tabs";
+        const observer      = new Observer(this);
+        const modifiers     = ['', "primary", "secondary"];
+        const {DOM_element} = $element;
+
+        const on_color_change = class_modifier(DOM_element, name, modifiers);
+        observer.on("color", v => on_color_change(v.toLowerCase()));
+
+        if (typeof this.color === "string") {
+            on_color_change(this.color.toLowerCase());
+        }
+
+        return;
         const el             = $element.DOM_element;
         this.tabs            = [];
         this.body            = el.lastChild;
@@ -33,14 +131,49 @@ class MDTabsController extends EventEmitter {
 
         $element.add_class("md-tabs");
         $element.once("rendered", () => {
-            if (! this.active_tab && this.tabs.length) {
-                this.tabs[0].activate(false);
+            if (! this.selected && this.tabs.length) {
+                this.select(this.tabs[0]);
             }
             $element.add_class("md-tabs--no-transition");
-            $element.rect();
+            $element.trigger_reflow();
             $element.remove_class("md-tabs--no-transition");
             this.is_rendered = true;
         });
+    }
+
+    select (tab) {
+        const selected_class = "md-tabs__button--selected";
+        let prev_indicator_rect;
+        if (this.selected) {
+            prev_indicator_rect = this.selected.$indicator.rect();
+            this.selected.$element.set_attr("tabindex", -1);
+            this.selected.$element.remove_class(selected_class);
+            this.selected.is_selected = false;
+        }
+
+        tab.$element.add_class(selected_class);
+        if (prev_indicator_rect) {
+            const curr_indicator_rect = tab.$indicator.rect();
+            const x_pos = prev_indicator_rect.left - curr_indicator_rect.left;
+            const ratio = prev_indicator_rect.width / curr_indicator_rect.width;
+            tab.$indicator.css({
+                transform  : `translateX(${x_pos}px) scaleX(${ratio})`,
+                transition : "none",
+            });
+            tab.$indicator.trigger_reflow();
+            tab.$indicator.css({transform: null, transition: null});
+        }
+
+        this.index      = this.tabs.indexOf(tab);
+        this.selected   = tab;
+        tab.$element.set_attr("tabindex", 0);
+        tab.is_selected = true;
+
+        if (this.initialized) {
+            this.$element.trigger("change", {
+                properties: {index: this.index}
+            });
+        }
     }
 
     add (tab) {
@@ -106,26 +239,6 @@ class MDTabsController extends EventEmitter {
             this.$tabs[index + 1].active();
         }
     }
-}
-
-module.exports = {
-    selector : "md-tabs",
-    style : "#include style.sass",
-    template : `{ jt }
-        .md-tabs__wrapper >
-            jfContent[select="md-tab"] ^
-        .md-tabs__header >
-            .nav-buttons >
-                jfContent[select="md-tabs-prev-button"] +
-                jfContent[select="md-tabs-next-button"] ^
-            .md-tabs__header__scroll-wrapper >
-                .md-tabs__header__scroller
-            ^   ^
-        .md-tabs__body
-    `,
-    bindings : {
-        instance: '='
-    },
-    controller      : MDTabsController,
-    controller_name : "$md_tabs",
 };
+
+exports.controller_name = "$md_tabs";

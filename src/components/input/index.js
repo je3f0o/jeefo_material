@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : index.js
 * Created at  : 2019-07-18
-* Updated at  : 2020-10-31
+* Updated at  : 2021-02-28
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -18,9 +18,7 @@
 const jqlite               = require("@jeefo/jqlite");
 const JeefoDOMParser       = require("@jeefo/jqlite/dom_parser");
 const Observer             = require("@jeefo/observer");
-const TranscludeController = require("@jeefo/component/transclude_controller");
-const md_theme             = require("@jeefo/material/services/theme");
-const class_modifier       = require("@jeefo/material/utils/class_modifier");
+const theme_service        = require("@jeefo/material/services/theme");
 const vendor               = require("../../services/vendor"); // jshint ignore:line
 //const menu_service         = require("../../services/menu");
 //const MDRipple             = require("../../utils/ripple");
@@ -28,12 +26,9 @@ const vendor               = require("../../services/vendor"); // jshint ignore:
 const modifier_class = {
     opened    : "md-input--opened",
     focused   : "md-input--focused",
-    disabled  : "md-input--activated",
+    disabled  : "md-input--disabled",
     activated : "md-input--activated",
 };
-
-//const prop_observer = Symbol("observer");
-const prop_disabled = Symbol("is-disabled");
 
 const KEY_ENTER      = 13;
 const KEY_SPACE      = 32;
@@ -243,25 +238,6 @@ const set_textarea_event_handlers = ($element, $textarea) => {
     });
 };
 
-const transluder = new TranscludeController(`
-{ jt }
-.md-input__notch-wrapper >
-    .md-input__notch >
-        .md-input__notch__head +
-        .md-input__notch__body >
-            .md-input__notch__body__content +
-            .md-input__notch__body__space-filler +
-            jfContent[select="label"] ^
-        .md-input__notch__tail ^
-    .md-input__wrapper >
-        .md-input__foreground >
-            jfContent.md-input__target[select="input"] +
-            jfContent.md-input__target[select="select"] +
-            jfContent.md-input__target[select="textarea"] +
-            jfContent[select="md-icon"] +
-            jfContent[select="md-button"]
-`);
-
 const select_nodes = JeefoDOMParser.parse(`
 { jt }
 div +
@@ -316,9 +292,29 @@ const leading_or_trailing = (parent_el, child_el, is_input_passed) => {
     }
 };
 
-const style = `
+exports.style = `
 /* sass */
 @import '@jeefo/material'
+
+@keyframes shake-filled
+    0%
+        transform: none
+    33%
+        transform: translateX(4px)
+    66%
+        transform: translateX(-4px)
+    100%
+        transform: none
+
+@keyframes shake-outlined
+    0%
+        transform: translateY(-50%)
+    33%
+        transform: translate(4px, -50%)
+    66%
+        transform: translate(-4px, -50%)
+    100%
+        transform: translateY(-50%)
 
 .md-input
     $root  : &
@@ -332,6 +328,7 @@ const style = `
 
     $left-align       : 16px
     $right-align      : 12px
+    $side-padding     : 16px
     $label-padding    : 4px
     $border-radius    : 4px
     $helper-baseline  : 16px
@@ -342,12 +339,9 @@ const style = `
 
     +rel
     width          : 100%
-    display        : inline-block
+    display        : block
     box-sizing     : border-box
     vertical-align : middle
-
-    .md-icon
-        pointer-events: none
 
     &__label
         +abs($top: 50%, $left: 16px)
@@ -355,7 +349,7 @@ const style = `
         max-width   : calc(100% - #{$left-align + $right-align + $label-padding})
         font-size   : 16px
         transform   : translateY(-50%)
-        transition  : left .25s, top .25s, transform .25s, color .25s, font-size .25s
+        transition  : left .25s, top .25s, transform .25s, color .15s, font-size .25s
         white-space : nowrap
 
         #{$root}--focused &,
@@ -364,17 +358,14 @@ const style = `
             left      : 16px
             font-size : $text-caption-size
 
-    &__helper-text
-        display    : block
-        padding    : 0 $right-align 0 $left-align
-        font-size  : $text-caption-size
-        text-align : left
-        box-sizing : border-box
+        #{$root}--invalid &:after
+            content     : '*'
+            margin-left : 1px
 
-        &:before
-            height  : $helper-baseline
-            content : ''
-            display : inline-block
+        &.shake-filled
+            animation: shake-filled 250ms
+        &.shake-outlined
+            animation: shake-outlined 250ms
 
     &__wrapper
         +rel
@@ -386,15 +377,32 @@ const style = `
         width       : 100%
         border      : none
         display     : block
+        background  : currentColor
         min-height  : 56px
         box-sizing  : border-box
         line-height : $line-height
+        transition  : color 150ms
 
         font:
             size   : 16px
             family : Roboto
         &:focus
             outline: none
+
+    &__captions
+        display         : flex
+        padding         : 0 $side-padding
+        justify-content : space-between
+
+    &__character-counter
+        padding-left: 16px
+
+    &__helper-text
+        display: block
+        &:before
+            height  : $helper-baseline
+            content : ''
+            display : inline-block
 
     select#{&}__target
         color  : transparent
@@ -470,6 +478,7 @@ const style = `
                 transition   : transform .25s cubic-bezier(.4, 0, .2, 1)
                 border-width : 2px
 
+
         #{$root}__label:before
             height     : 0
             content    : ''
@@ -482,8 +491,9 @@ const style = `
                 transform : none
                 &:before
                     height: 20px
-            #{$root}__wrapper:after
-                transform: scaleX(1)
+
+        &#{$root}--focused #{$root}__wrapper:after
+            transform: scaleX(1)
 
     &--outlined
         #{$root}__target
@@ -513,7 +523,7 @@ const style = `
                     content    : ''
                     display    : block
                     border-top : 1px solid
-                    transition : width .25s, border-top-color .25s
+                    transition : width .25s
                 &:after
                     right : 0
 
@@ -521,8 +531,7 @@ const style = `
                 flex-grow  : 1
                 border-top : 1px solid
 
-        &:hover,
-        &#{$root}--focused
+        &:not(#{$root}--disabled)#{$root}--focused
             #{$notch}__head,
             #{$notch}__tail,
             #{$notch}__body,
@@ -535,12 +544,13 @@ const style = `
         &#{$root}--activated
             #{$root}__label
                 left: $left-align
-            #{$notch}__body
-                &__content
-                    &:before, &:after
-                        width: 0
+            #{$notch}__body__content
+                &:before, &:after
+                    width: 0
 
 
+    .md-icon
+        pointer-events: none
 
     &--with-leading-icon
         #{$root}__leading-icon
@@ -579,395 +589,255 @@ const style = `
     &--with-trailing-button
         #{$root}__target
             padding-right: $icon-box-width
-
-    // ===============================
-    // theme
-    // ===============================
-
-    // Select
-    //&__list-wrapper
-        @extend %background
-    //md-list
-        @extend %background-surface--activated
 `;
 
-md_theme.register_template(`
+theme_service.set_default({
+    ".md-input": {
+        "color": "rgba($on_surface-color, .6)",
+    },
+    ".md-input--disabled": {
+        "color": "rgba($on_surface-color, .38)",
+    },
+    ".md-input:not(.md-input--disabled).md-input--invalid": {
+        "color": "$error-color",
+    },
+    ".md-input:not(.md-input--disabled) .md-input__target": {
+        "color": "rgba($on_surface-color, .87)",
+    },
+    ".md-input:not(.md-input--disabled):not(.md-input--invalid).md-input--focused .md-input__notch-wrapper": {
+        "color": "$primary-color",
+    },
+
+    // Filled
+    ".md-input--filled .md-input__target": {
+        "background-color": "rgba($on_surface-color, .04)",
+    },
+    ".md-input--filled:not(.md-input--disabled) .md-input__target:hover": {
+        "background-color": "rgba($on_surface-color, .08)",
+    },
+    ".md-input--filled:not(.md-input--disabled).md-input--focused .md-input__target": {
+        "background-color": "rgba($on_surface-color, .12)",
+    },
+
+    // Outlined
+    ".md-input--outlined:not(.md-input--disabled):not(.md-input--invalid) .md-input__notch": {
+        "color": "rgba($on_surface-color, .38)",
+    },
+    ".md-input--outlined:not(.md-input--disabled):not(.md-input--invalid):hover .md-input__notch": {
+        "color": "rgba($on_surface-color, .87)",
+    },
+    ".md-input--outlined:not(.md-input--disabled):not(.md-input--invalid):not(.md-input--focused) .md-input__label": {
+        "color": "rgba($on_surface-color, .6)",
+    },
+    ".md-input--outlined:not(.md-input--disabled):not(.md-input--invalid).md-input--focused .md-input__notch": {
+        "color": "$primary-color",
+    },
+});
+
+theme_service.register_template(`
 /* sass */
 @import '@jeefo/material'
 
 .md-input
     $root: &
 
-    #{$root}__foreground
+    +property-template(color)
+
+    &--disabled
         +property-template(color)
 
-    +theme-modifiers($root, (primary, secondary))
-        &#{$root}--focused
+    &:not(#{$root}--disabled)
+        #{$root}__target
             +property-template(color)
 
-    +theme-modifiers($root, (error))
-        +property-template(color)
+        &#{$root}--invalid
+            +property-template(color)
 
+        &:not(#{$root}--invalid)#{$root}--focused #{$root}__notch-wrapper
+            +property-template(color)
+
+    // Filled
     &--filled
-        & #{$root}__input-wrapper
+        #{$root}__target
             +property-template(background-color)
 
-        & #{$root}__target
-            +property-template(background-color)
-            &:hover
+        &:not(#{$root}--disabled)
+            #{$root}__target:hover
                 +property-template(background-color)
 
-        &#{$root}--focused #{$root}__target
-            +property-template(background-color)
+            &#{$root}--focused #{$root}__target
+                +property-template(background-color)
 
+    // Outlined
+    &--outlined:not(#{$root}--disabled):not(#{$root}--invalid)
+        #{$root}__notch,
+        &:hover #{$root}__notch,
+        &#{$root}--focused #{$root}__notch,
+        &:not(#{$root}--focused) #{$root}__label
+            +property-template(color)
 `);
 
-module.exports = {
-    selector : "md-input-container",
+exports.template = `
+{jt}
+.md-input__notch-wrapper >
+    .md-input__notch >
+        .md-input__notch__head +
+        .md-input__notch__body >
+            .md-input__notch__body__content +
+            .md-input__notch__body__space-filler +
+            jfContent.md-input__label[select="label"] ^
+        .md-input__notch__tail ^
+    .md-input__wrapper >
+        jfContent.md-input__target[select="input"] +
+        jfContent.md-input__target[select="select"] +
+        jfContent.md-input__target[select="textarea"] +
+        jfContent[select="md-icon"] +
+        jfContent[select="md-button"]
+    ^   ^
+mdTypography.md-input__captions[variant="caption"] >
+    div >
+        jfContent.md-input__helper-text[select="helper-text"] ^
+    .md-input__character-counter
+`;
 
-    style,
+exports.bindings = {
+    variant             : '@',
+    isInvalid           : '<',
+    isDisabled          : '<',
+    hasCharacterCounter : '<',
+};
 
-    template : element => {
-        const helper_text_elems = [];
-        let i = element.children.length;
-        let is_input_passed;
+exports.controller = class MDInputContainer {
+    on_init ($element) {
+        $element.add_class("md-input");
+        const $input   = $element.first(".md-input__target");
+        const $label   = $element.first(".md-input__label");
+        const $notch   = $element.first(".md-input__notch__body__content");
+        const input    = $input ? $input.DOM_element : null;
+        const observer = new Observer(this);
+        this.$element  = $element;
 
-        while (i--) {
-            const child = element.children[i];
-            switch (child.tagName) {
-                case "HELPER-TEXT" :
-                    const helper = replace_element(child, helper_div.cloneNode());
-                    element.removeChild(child);
-                    helper.classList.add("md-input__helper-text");
-                    helper_text_elems.push(helper);
-                    break;
-                case "MD-ICON"   :
-                case "MD-BUTTON" :
-                    leading_or_trailing(element, child, is_input_passed);
-                    break;
-                case "INPUT":
-                case "SELECT":
-                case "TEXTAREA":
-                    is_input_passed = true;
-                    break;
-            }
-        }
-
-        transluder.transclude(element);
-        element.classList.add("md-input");
-
-        const label = element.querySelector(".md-input__notch__body > label");
-        if (label) label.classList.add("md-input__label");
-
-        const foreground = element.querySelector(".md-input__foreground");
-        const inputs     = foreground.querySelectorAll(".md-input__target");
-        if (inputs.length !== 1) {
-            throw new Error("MDInput element length is not valid");
-        }
-        let input = inputs[0];
-        if (input) {
-            switch (input.tagName) {
-                case "SELECT" :
-                    foreground.appendChild(select_nodes[0].cloneNode(true));
-                    element.appendChild(select_nodes[1].cloneNode(true));
-                    break;
-                case "TEXTAREA" :
-                    const editable = editable_div.cloneNode();
-                    replace_element(input, editable);
-                    foreground.replaceChild(editable, input);
-                    input = editable;
-                    break;
-            }
-            input.classList.add("md-input__target");
-        }
-
-        helper_text_elems.forEach(el => element.appendChild(el));
-
-        /*
-        let has_select = false;
-        const helper_nodes = [];
-
-        if (! node.class_list.includes("md-input")) {
-            node.class_list.push("md-input");
-        }
-
-        let i = node.children.length;
-        while (i--) {
-            switch (node.children[i].name) {
-                case "select" :
-                    has_select = true;
-                    break;
-                case "helper-text" :
-                    const helper = remove_element(node.children, i);
-                    helper.name = "div";
-                    helper.class_list.push("md-input-helper-text");
-                    helper_nodes.push(helper);
-                    break;
-            }
-        }
-
-        const icon_index = node.children.findIndex(n => n.name === "md-icon");
-
-        if (icon_index >= 0) {
-            const input_index = node.children.findIndex(n => {
-                return inputs.includes(n.name);
-            });
-
-            if (icon_index < input_index) {
-                node.class_list.push("md-input-with-leading-icon");
-                node.children[icon_index].class_list.push(
-                    "md-input-leading-icon"
-                );
-
-                for (let i = input_index + 1; i < node.children.length; ++i) {
-                    if (node.children[i].name === "md-icon") {
-                        node.children[i].class_list.push(
-                            "md-input-trailing-icon"
-                        );
-                        node.class_list.push("md-input-with-trailing-icon");
-                        break;
-                    }
-                }
-            } else if (input_index >= 0) {
-                node.children[icon_index].class_list.push(
-                    "md-input-trailing-icon"
-                );
-                node.class_list.push("md-input-with-trailing-icon");
-            }
-        }
-
-        node.children = transluder.transclude(node.children);
-
-        const input_wrapper = node.children.find(child => {
-            return child.class_list[0] === "md-input__wrapper";
+        $input.on("blur", () => {
+            $element.remove_class(modifier_class.focused);
         });
 
-        if (input_wrapper.children.length !== 1) {
-            throw new Error("MDInput element length is not right");
-        }
-        //const input = input_wrapper.children[0];
-        if (input && input.name === "textarea") {
-            input.name = "div";
-            input.attrs.set("contenteditable", "true");
-        }
-        if (! input.class_list.includes("md-input__target")) {
-            input.class_list.unshift("md-input__target");
+        $input.on("focus", () => {
+            if ($element.has_class("md-input--outlined") && $label) {
+                this.set_notch_width($notch, $label);
+            }
+            $element.add_class(modifier_class.focused);
+        });
+
+        switch ($input.name) {
+            case "INPUT" :
+                set_input_event_handlers($element, $input);
+                break;
+            case "DIV" :
+                set_textarea_event_handlers($element, $input);
+                break;
+            case "SELECT" :
+                this.options = $input.DOM_element.options;
+                set_select_event_handlers($element, $input, this);
+                break;
+            default:
+                console.warn(
+                    `MDInput ${ $input.name } is not implemented yet.`
+                );
         }
 
-        //const appearance        = node.attrs.get("appearance");
-        const has_class_outline = node.class_list.includes("md-input_outlined");
-        const is_outlined = (
-            has_class_outline ||
-            (appearance && appearance.trim().toLowerCase() === "outlined")
+        const on_disable_change = is_disabled => {
+            let prop = input.tagName === "DIV" ? "contentEditable" : "disabled";
+            if (is_disabled) {
+                input[prop] = true;
+                $element.add_class(modifier_class.disabled);
+            } else {
+                input[prop] = false;
+                $element.remove_class(modifier_class.disabled);
+            }
+        };
+
+        let old_variant;
+        const on_variant_change = value => {
+            if (! value) value = "filled";
+            if (old_variant) {
+                $label.remove_class(`shake-${old_variant}`);
+                $element.remove_class(`md-input--${old_variant}`);
+            }
+            $element.add_class(`md-input--${value}`);
+
+            if (value === "outlined") this.set_notch_width($notch, $label);
+            if ($label && $element.has_class("md-input--invalid")) {
+                this.shake_label($label);
+            }
+            old_variant = value;
+        };
+
+        const on_invalid_change = value => {
+            $element[`${value ? 'add' : 'remove'}_class`]("md-input--invalid");
+            if ($label) {
+                if ($element.has_class("md-input--outlined")) {
+                    this.set_notch_width($notch, $label);
+                }
+                if (value) {
+                    this.shake_label($label);
+                } else {
+                    $label.remove_class(this.get_shake_class());
+                }
+            }
+        };
+
+        on_variant_change(this.variant);
+        on_invalid_change(this.isInvalid);
+        on_disable_change(this.isDisabled);
+        observer.on("variant"    , on_variant_change);
+        observer.on("isInvalid"  , on_invalid_change);
+        observer.on("isDisabled" , on_disable_change);
+    }
+
+    set_notch_width ($notch, $label) {
+        const font_size  = $label.style("fontSize")   || null;
+        const transition = $label.style("transition") || null;
+
+        $label.css({
+            fontSize   : "12px",
+            transition : "none",
+        });
+
+        $notch.width = $label.width + 8;
+
+        $label.style("fontSize", font_size);
+        $label.trigger_reflow();
+        $label.style("transition", transition);
+    }
+
+    shake_label ($label) {
+        const {$element}   = this;
+        const shake_class  = this.get_shake_class();
+        const is_shackable = (
+            $element.has_class("md-input--focused") ||
+            $element.has_class("md-input--activated")
         );
 
-        if (is_outlined) {
-            if (! has_class_outline) {
-                node.class_list.push("md-input_outlined");
-            }
-
-            const field = field_node.clone(true);
-            const index = node.children.findIndex(n => n.name === "label");
-            if (index >= 0) {
-                const label = remove_element(node.children, index);
-                label.class_list.push("md-input__label");
-                field.children[0].children[1].children.push(label);
-            }
-            node.children.unshift(field);
+        if (is_shackable) {
+            $label.add_class(shake_class);
         } else {
-            //node.class_list.push("md-input-filled");
-            //node.children.push(underline_node);
+            $label.remove_class(shake_class);
         }
+    }
 
-        if (has_select) {
-            //input_overlay.forEach(n => node.children.push(n.clone(true)));
+    is_shackable ($input) {
+        return $input && (
+            $input.focused || $input.has_class("md-input--activated")
+        );
+    }
+
+    get_shake_class () {
+        let variant = "filled";
+        if (this.$element.has_class("md-input--outlined")) {
+            variant = "outlined";
         }
-
-        // final step
-        //node.children.push(helper_nodes);
-        */
-    },
-
-    bindings : {
-        color           : '@',
-        [prop_disabled] : "<isDisabled",
-        ["on_open"]     : "<onOpen",
-    },
-
-    controller_name : "$input",
-
-    controller : class MDInputContainer {
-        on_init ($element) {
-            const $input = $element.first(".md-input__target");
-            const $label = $element.first(".md-input__label");
-            const $notch = $element.first(".md-input__notch__body__content");
-
-            $input.on("blur", () => {
-                $element.remove_class(modifier_class.focused);
-            });
-
-            $input.on("focus", () => {
-                if ($element.has_class("md-input--outlined") && $label) {
-                    $label.css({
-                        fontSize   : "12px",
-                        transition : "none"
-                    });
-
-                    $notch.width = $label.width + 8;
-
-                    $label.style("fontSize", null);
-                    $label.trigger_reflow();
-                    $label.remove_attr("style");
-                }
-                $element.add_class(modifier_class.focused);
-            });
-
-            const has_variant_class = (
-                $element.has_class("md-input--filled") ||
-                $element.has_class("md-input--outlined")
-            );
-            if (! has_variant_class) {
-                const variant = $element.get_attr("variant") || "filled";
-                if (variant) {
-                    $element.add_class(`md-input--${variant}`);
-                }
-            }
-
-            switch ($input.name) {
-                case "INPUT" :
-                    set_input_event_handlers($element, $input);
-                    break;
-                case "DIV" :
-                    set_textarea_event_handlers($element, $input);
-                    break;
-                case "SELECT" :
-                    this.options = $input.DOM_element.options;
-                    set_select_event_handlers($element, $input, this);
-                    break;
-                default:
-                    console.warn(
-                        `MDInput ${ $input.name } is not implemented yet.`
-                    );
-            }
-
-            const observer = new Observer(this);
-            observer.on(prop_disabled, is_disabled => {
-                if (is_disabled) {
-                    if ($input.name === "DIV") {
-                        $input.remove_attr("contenteditable");
-                    } else {
-                        $input.set_attr("disabled");
-                    }
-                    $element.add_class(modifier_class.disabled);
-                } else {
-                    if ($input.name === "DIV") {
-                        $input.set_attr("contenteditable");
-                    } else {
-                        $input.remove_attr("disabled");
-                    }
-                    $element.remove_class(modifier_class.disabled);
-                }
-            });
-
-            if (typeof this.color === "string") {
-                const modifiers = ["primary", "secondary", "error"];
-                const on_color_change = class_modifier(
-                    $element.DOM_element, "md-input", modifiers
-                );
-                observer.on("color", v => on_color_change(v.toLowerCase()));
-                on_color_change(this.color.toLowerCase());
-            }
-
-            /*
-            let $placeholder, $replacement;
-            if (! $input) {
-                $input = $element.first("textarea");
-                if ($input) {
-                    const $filler = jqlite('<div layout-space-filler></div>');
-                    $element.attrs({
-                        layout      : "column",
-                        layoutAlign : "none end"
-                    });
-                    $element.children(0).before($filler);
-
-                    $replacement   = jqlite("<div contenteditable></div>");
-                    if ($input.has_attr("minRow")) {
-                        const row        = $input.get_attr("minRow");
-                        const min_height = parseInt(row) * 20;
-                        $element.style("minHeight", `${min_height}px`);
-                    }
-                    if ($input.has_attr("maxRow")) {
-                        const row        = $input.get_attr("maxRow");
-                        const max_height = parseInt(row) * 20;
-                        $element.style("maxHeight", `${max_height}px`);
-                    }
-                }
-            }
-
-            if (! $input) { return; }
-
-            if ($input.has_attr("placeholder")) {
-                const text     = $input.get_attr("placeholder");
-                const template = `<div class="md-placeholder">${ text }</div>`;
-                $placeholder = jqlite(template);
-                $input.before($placeholder);
-                $input.remove_attr("placeholder");
-            }
-            if ($replacement) {
-                $input.replace($replacement);
-                $input = $replacement;
-            }
-
-            $input.on("focus", () => {
-                $element.add_class("focused");
-            });
-            $input.on("blur", () => {
-                $element.remove_class("focused");
-            });
-            $input.on("input", () => {
-                if ($placeholder) {
-                    if ($input.value) {
-                        $placeholder.add_class("hide");
-                    } else {
-                        $placeholder.remove_class("hide");
-                    }
-                }
-                if ($input.value) {
-                    $element.add_class("activated");
-                } else {
-                    $element.remove_class("activated");
-                }
-            });
-
-            const observer = new Observer(this);
-            observer.on(prop_disabled, is_disabled => {
-                if (is_disabled) {
-                    $input.set_attr("disabled");
-                    $element.add_class("disabled");
-                } else {
-                    $input.remove_attr("disabled");
-                    $element.remove_class("disabled");
-                }
-            });
-            */
-
-            /* // Disable event handler using MutationObserver
-            const observer = new MutationObserver(mutations => {
-                mutations.forEach(mutation => {
-                    console.log(mutation);
-                    if (mutation.attributeName === "disabled") {
-                        $element.add_class("disabled");
-                    }
-                });
-            });
-
-            const config = { attributes : true };
-            observer.observe($input.DOM_element, config);
-
-            this[prop_observer] = observer;
-            */
-        }
-
-        //on_destroy () { this[prop_observer].disconnect(); }
+        return `shake-${variant}`;
     }
 };
+
+exports.controller_name = "$md_input";

@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : color_palletes.js
 * Created at  : 2020-10-12
-* Updated at  : 2020-10-12
+* Updated at  : 2021-02-26
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -328,8 +328,6 @@ exports.blue_grey = {
 
 //exports.black = "#000";
 //exports.white = "#fff";
-
-// Typography
 
 /*
 $clr-ui-display-4: $clr-grey-600;

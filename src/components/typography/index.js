@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : index.js
 * Created at  : 2020-10-31
-* Updated at  : 2020-10-31
+* Updated at  : 2021-02-23
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -92,6 +92,18 @@ $font-weights: map.merge($font-weights, ("black"       : 900))
         text-transform: uppercase
 `;
 
+md_theme.set_default({
+    ".md-typography.md-typography--primary": {
+        "color" : "$primary-color",
+    },
+    ".md-typography.md-typography--secondary": {
+        "color" : "$secondary-color",
+    },
+    ".md-typography.md-typography--error": {
+        "color" : "$error-color",
+    },
+});
+
 md_theme.register_template(`
 /* sass */
 @import '@jeefo/material'
@@ -124,23 +136,23 @@ exports.bindings = {
 
 exports.controller = class MDTypography {
     on_init ($element) {
+        const el   = $element.DOM_element;
         const root = "md-typography";
         $element.add_class(root);
 
         const observer = new Observer(this);
         if (typeof this.variant === "string") {
-            const on_variant_change = class_modifier(
-                $element.DOM_element, root, modifiers
-            );
+            const on_variant_change = class_modifier(el, root, modifiers);
             observer.on("variant", v => on_variant_change(v.toLowerCase()));
             on_variant_change(this.variant.toLowerCase());
         }
         if (typeof this.color === "string") {
-            const on_color_change = class_modifier(
-                $element.DOM_element, root, ["primary", "secondary", "error"]
-            );
+            const colors = ["primary", "secondary", "error"];
+            const on_color_change = class_modifier( el, root, colors);
             observer.on("variant", v => on_color_change(v.toLowerCase()));
             on_color_change(this.color.toLowerCase());
         }
     }
 };
+
+exports.controller_name = "$md_typography";

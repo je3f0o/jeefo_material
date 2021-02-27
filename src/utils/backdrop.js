@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : backdrop.js
 * Created at  : 2019-12-10
-* Updated at  : 2019-12-11
+* Updated at  : 2021-01-17
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -15,11 +15,7 @@
 
 // ignore:end
 
-const jqlite = require("@jeefo/jqlite");
+const jqlite    = require("@jeefo/jqlite");
+const $backdrop = jqlite('<div class="md-sidenav-container__backdrop"></div>');
 
-module.exports = $container => {
-    const class_list = ["md-backdrop"].join(' ');
-    const $element = jqlite(`<div class="${ class_list }"></div>`);
-    $container.append($element);
-    return $element;
-};
+module.exports = () => $backdrop.clone();

@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : item.js
 * Created at  : 2019-10-08
-* Updated at  : 2020-07-05
+* Updated at  : 2021-02-19
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -15,42 +15,37 @@
 
 // ignore:end
 
-const Observer       = require("@jeefo/observer");
-const JeefoDOMParser = require("@jeefo/jqlite/dom_parser");
+const IMDListItem = require("./event_handler");
 
-const ripple = JeefoDOMParser.parse(`{jt} mdRipple`)[0];
+exports.selector = "md-list-item";
 
-module.exports = {
-    selector : "md-list-item",
+exports.template = `
+{jt}
+jfContent +
+mdRipple
+`;
 
-    bindings : {
-        isSelected : '<'
-    },
+exports.dependencies = {
+    md_list_ctrl: "mdList",
+};
 
-    template : element => {
-        element.classList.add("md-list__item");
-        element.setAttribute("layout", "row");
-        element.setAttribute("layout-align", "none center");
-		element.appendChild(ripple.cloneNode());
-    },
+exports.bindings = {
+    is_selected: "<isSelected",
+};
 
-    controller : class MDListItem {
-        on_init ($element) {
-            const observer = new Observer(this);
-            const on_select = is_selected => {
-                if (is_selected) {
-                    $element.add_class("md-list__item--selected");
-                } else {
-                    $element.remove_class("md-list__item--selected");
-                }
-            };
-            on_select(this.isSelected);
-            observer.on("isSelected", on_select);
-            /*
-            if ($element.first(":scope > md-icon")) {
-                $element.add_class("has-icon");
-            }
-            */
-        }
+exports.controller = class MDListItem extends IMDListItem {
+    on_init ($element) {
+        this.$element = $element;
+        super.init();
+
+        $element.on("click", () => {
+            this.md_list_ctrl.select(this);
+        });
+    }
+
+    on_destroy () {
+        this.md_list_ctrl.remove(this);
     }
 };
+
+exports.controller_name = "$md_list__item";
