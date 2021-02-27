@@ -19,8 +19,8 @@ const for_each            = require("@jeefo/utils/object/for_each");
 const {definitions_table} = require("@jeefo/component");
 
 const directives = {
-    "theme"    : "@jeefo/material/directives/md_theme",
-    "emphasis" : "@jeefo/material/directives/md_emphasis",
+    "md-theme"    : "@jeefo/material/directives/theme",
+    "md-emphasis" : "@jeefo/material/directives/emphasis",
     //"md-elevation" : "@jeefo/material/directives/md_elevation",
 };
 

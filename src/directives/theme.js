@@ -1,5 +1,5 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
-* File Name   : md_theme.js
+* File Name   : theme.js
 * Created at  : 2019-12-02
 * Updated at  : 2021-02-28
 * Author      : jeefo
