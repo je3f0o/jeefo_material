@@ -390,6 +390,9 @@ exports.style = `
             family : Roboto
         &:focus
             outline: none
+        &:disabled
+            opacity                 : 1
+            -webkit-text-fill-color : currentColor
 
     &__captions
         display         : flex
