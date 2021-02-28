@@ -15,6 +15,7 @@
 
 // ignore:end
 
+const router   = require("@jeefo/state");
 const md_media = require("@jeefo/material/services/media");
 
 const style = `
@@ -94,7 +95,7 @@ mdTypography[
                 ^   ^   ^
             [style="padding: 16px;"] >
                 uiView ^
-            .footer(Version: {{version}} and {{version + 'suffix'}} again)
+            .footer[style="padding: 0 16px;"](Version: {{version}})
 `;
 
 class MainState {
@@ -145,6 +146,10 @@ class MainState {
             {label: "Sidenav"                          , url: "sidenav"   } ,
             {label: "Selection"                        , url: "selection" } ,
         ].sort((a, b) => a.label.localeCompare(b.label));
+
+        router.on("change_state", () => {
+            if (md_media.is("xs")) this._is_open = false;
+        });
     }
 
     get is_open () {
