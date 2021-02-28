@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : main.list_state.js
 * Created at  : 2021-01-18
-* Updated at  : 2021-02-24
+* Updated at  : 2021-02-28
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -15,12 +15,7 @@
 
 // ignore:end
 
-const template = `
-{jt}
-demoBox >
-    mdTabs >
-        mdTab[mdEmphasis="high"](List item) ^
-    attributes[mdEmphasis="medium"] >
+/*
         .demo-box__attr-title[mdEmphasis="high"](Before list text) +
         mdSelection[
             align      = "middle"
@@ -64,6 +59,15 @@ demoBox >
             ] +
             label(Text)
         ^   ^
+*/
+
+const template = `
+{jt}
+demoBox >
+    mdTabs >
+        mdTab[mdEmphasis="high"](List item) ^
+    attributes[mdEmphasis="medium"] >
+        .demo-box__attr-title[mdEmphasis="high"](Not completed yet) ^
     [style="padding: 40px; width: 100%;"] >
         mdCard[shape="square" variant="outlined"] >
             mdList >

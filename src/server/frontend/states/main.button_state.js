@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : main.button_state.js
 * Created at  : 2021-02-24
-* Updated at  : 2021-02-27
+* Updated at  : 2021-02-28
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -20,8 +20,7 @@ const template = `
 demoBox >
     mdTabs >
         mdTab(Normal button) +
-        mdTab(Icon) +
-        mdTab(FAB) ^
+        mdTab(Icon) ^
     attributes >
         [jfClass="{ hide: $demo_box.index !== 0 }"] >
             .demo-box__attr-title[mdEmphasis="high"](Binary options) +
@@ -51,10 +50,6 @@ demoBox >
         mdButton[variant="{{ variant }}" isDisabled="is_disabled"](Button) ^
     [jfClass="{ hide: $demo_box.index !== 1 }"] >
         mdButton[variant="icon" isDisabled="is_disabled"] >
-            mdIcon[name="stars"]
-        ^   ^
-    [jfClass="{ hide: $demo_box.index !== 2 }"] >
-        mdButton[variant="fab"] >
             mdIcon[name="stars"]
 `;
 

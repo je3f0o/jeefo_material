@@ -23,6 +23,8 @@ const vendor               = require("../../services/vendor"); // jshint ignore:
 //const menu_service         = require("../../services/menu");
 //const MDRipple             = require("../../utils/ripple");
 
+const {isInteger} = Number;
+
 const modifier_class = {
     opened    : "md-input--opened",
     focused   : "md-input--focused",
@@ -394,6 +396,9 @@ exports.style = `
         padding         : 0 $side-padding
         justify-content : space-between
 
+    &--hide
+        display: none !important
+
     &__character-counter
         padding-left: 16px
 
@@ -696,26 +701,36 @@ exports.template = `
     ^   ^
 mdTypography.md-input__captions[variant="caption"] >
     div >
-        jfContent.md-input__helper-text[select="helper-text"] ^
-    .md-input__character-counter
+        .md-input__helper-text[if="$md_input.max_length_passed"](Max length passed) +
+        [jfClass="{'md-input--hide': $md_input.max_length_passed}"] >
+            jfContent.md-input__helper-text[select="helper-text"]
+        ^   ^
+    .md-input__helper-text.md-input__character-counter[
+        jfClass="{'md-input--hide': ! $md_input.on_input}"
+    ]
 `;
 
 exports.bindings = {
-    variant             : '@',
-    isInvalid           : '<',
-    isDisabled          : '<',
-    hasCharacterCounter : '<',
+    variant    : '@',
+    maxLength  : '@',
+    isInvalid  : '<',
+    isDisabled : '<',
 };
 
 exports.controller = class MDInputContainer {
     on_init ($element) {
         $element.add_class("md-input");
-        const $input   = $element.first(".md-input__target");
-        const $label   = $element.first(".md-input__label");
-        const $notch   = $element.first(".md-input__notch__body__content");
-        const input    = $input ? $input.DOM_element : null;
-        const observer = new Observer(this);
-        this.$element  = $element;
+        const $input        = $element.first(".md-input__target");
+        const $label        = $element.first(".md-input__label");
+        const $notch        = $element.first(".md-input__notch__body__content");
+        const $char_counter = $element.first(".md-input__character-counter");
+        const input         = $input ? $input.DOM_element : null;
+        const observer      = new Observer(this);
+
+        this.wrapper           = $element.first(".md-input__wrapper").DOM_element;
+        this.$element          = $element;
+        this.max_length_passed = false;
+        this.check_icons();
 
         $input.on("blur", () => {
             $element.remove_class(modifier_class.focused);
@@ -772,8 +787,13 @@ exports.controller = class MDInputContainer {
             old_variant = value;
         };
 
+        let limit;
         const on_invalid_change = value => {
-            $element[`${value ? 'add' : 'remove'}_class`]("md-input--invalid");
+            if (value) {
+                $element.add_class("md-input--invalid");
+            } else if (! this.max_length_passed) {
+                $element.remove_class("md-input--invalid");
+            }
             if ($label) {
                 if ($element.has_class("md-input--outlined")) {
                     this.set_notch_width($notch, $label);
@@ -786,10 +806,42 @@ exports.controller = class MDInputContainer {
             }
         };
 
+        const on_input = () => {
+            const {length} = input.value;
+            $char_counter.text = `${length}/${limit}`;
+            if (length > limit) {
+                this.max_length_passed = true;
+                on_invalid_change(true);
+            } else if (this.max_length_passed) {
+                this.max_length_passed = false;
+                on_invalid_change(this.isInvalid);
+            }
+        };
+
+        const on_max_length_change = value => {
+            if (!input) return;
+            value = +value;
+
+            if (isInteger(value) && value > 0) {
+                limit = value;
+                if (! this.on_input) {
+                    this.on_input = $input.on("input", on_input);
+                }
+                on_input();
+            } else if (this.on_input) {
+                $input.off("input", this.on_input);
+                this.on_input          = null;
+                this.max_length_passed = false;
+                on_invalid_change(this.isInvalid);
+            }
+        };
+
         on_variant_change(this.variant);
         on_invalid_change(this.isInvalid);
         on_disable_change(this.isDisabled);
+        on_max_length_change(this.maxLength);
         observer.on("variant"    , on_variant_change);
+        observer.on("maxLength"  , on_max_length_change);
         observer.on("isInvalid"  , on_invalid_change);
         observer.on("isDisabled" , on_disable_change);
     }
@@ -837,6 +889,28 @@ exports.controller = class MDInputContainer {
             variant = "outlined";
         }
         return `shake-${variant}`;
+    }
+
+    check_icons () {
+        const {wrapper, $element} = this;
+        let input_passed;
+        $element.remove_class(
+            "md-input--with-leading-icon", "md-input--with-trailing-icon"
+        );
+
+        for (let i = 0; i < wrapper.children.length; ++i) {
+            const el = wrapper.children[i];
+            switch (el.tagName) {
+                case "MD-ICON" :
+                    const pos = input_passed ? "trailing" : "leading";
+                    $element.add_class(`md-input--with-${pos}-icon`);
+                    el.classList.add(`md-input__${pos}-icon`);
+                    break;
+                case "INPUT":
+                    input_passed = true;
+                    break;
+            }
+        }
     }
 };
 

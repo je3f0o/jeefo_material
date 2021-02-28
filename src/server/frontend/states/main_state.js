@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : main_state.js
 * Created at  : 2021-01-14
-* Updated at  : 2021-02-27
+* Updated at  : 2021-02-28
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -32,7 +32,10 @@ const style = `
     +flex-center
     flex-direction: column
 
-input, select, textarea, button, a
+[md-theme="dark"] .md-sidenav-container__backdrop
+    opacity: .5
+
+input, select, textarea, a
     //-webkit-tap-highlight-color: rgba(0,0,0,0)
     -webkit-tap-highlight-color: transparent
 `;

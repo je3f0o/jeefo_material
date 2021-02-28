@@ -69,7 +69,7 @@ require("./states/register");
 const sheet = {};
 const rules = {};
 
-Object.assign(rules, {
+Object.assign(sheet, {
     /*
     // MD Input
     '.md-input.md-input--primary.md-input--focused': {
@@ -133,6 +133,7 @@ md_theme.register_theme({
         on_surface    : "#000",
         on_background : "#000",
     },
+    sheet,
     rules,
 });
 

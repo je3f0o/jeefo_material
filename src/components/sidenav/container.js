@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : container.js
 * Created at  : 2019-06-21
-* Updated at  : 2021-02-23
+* Updated at  : 2021-02-28
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -49,7 +49,7 @@ $anim_duration: .4s
 
     &__backdrop
         +abs($all: 0)
-        opacity          : .12
+        opacity          : .38
         z-index          : 15
         background-color : black
 

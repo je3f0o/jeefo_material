@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : index.js
 * Created at  : 2020-10-28
-* Updated at  : 2021-02-26
+* Updated at  : 2021-02-28
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -167,6 +167,8 @@ exports.controller = class MDCheckbox {
                 this.value = false;
             }
         });
+
+        observer.on("value", value => input.checked = !!value);
 
         observer.on("isDisabled", value => {
             if (value) {

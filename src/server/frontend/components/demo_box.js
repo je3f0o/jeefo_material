@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : demo_box.js
 * Created at  : 2021-01-24
-* Updated at  : 2021-02-27
+* Updated at  : 2021-02-28
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -23,10 +23,15 @@ exports.style = `
 @import '@jeefo/material'
 
 .demo-box
+    $root: &
+
     height     : 400px
     border     : 1px solid
     display    : block
     transition : box-shadow 150ms linear
+
+    .demo-sidenav
+        width: 200px
 
     &:hover
         box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.08), 0 0 15px 0 rgba(0, 0, 0, 0.02), 0 0 20px 4px rgba(0, 0, 0, 0.06)
@@ -56,6 +61,55 @@ exports.style = `
 
     .md-button
         flex-shrink : 0
+
+    &.dense
+        .demo-sidenav
+            width: 210px
+
+        #{$root}__attributes
+            font-size: 14px
+
+        #{$root}__attr-title
+            padding: 12px 0 5px 10px
+
+        .md-selection
+            padding   : 3px 8px
+            label
+                font-size   : 14px
+                margin-left : 7px !important
+
+        .md-checkbox
+            input,
+            &__ripple:before,
+            &__ripple:after
+                +size(28px)
+                top  : -3px
+                left : -3px
+            svg
+                +size(22px)
+            .md-icon:after
+                +size(16px)
+                top  : 3px
+                left : 3px
+
+        .md-radio
+            input,
+            &__ripple:before,
+            &__ripple:after
+                +size(28px)
+                top  : -3px
+                left : -3px
+            svg
+                +size(22px)
+
+            &__icon
+                +size(18px)
+                &:after
+                    +size(100%)
+                    top  : 0
+                    left : 0
+            input:checked ~ .md-radio__icon:after
+                transform: scale(.5)
 `;
 
 md_theme.set_default({
@@ -64,6 +118,9 @@ md_theme.set_default({
     },
     ".demo-box__appbar": {
         "border-color": "$divider-color",
+    },
+    ".demo-box__body": {
+        "background-color": "$background-color",
     },
 });
 
@@ -76,19 +133,20 @@ md_theme.register_template(`
 
     &__appbar
         +property-template(border-color)
+    &__body
+        +property-template(background-color)
 `);
 
 exports.template = `
 {jt}
 mdSidenavContainer[mdElevation="1"] >
-    mdSidenav[
-        style    = "width: 200px;"
+    mdSidenav.demo-sidenav[
         isOpen   = "$demo_box.is_open"
         variant  = "{{ $demo_box.mode }}"
         position = "right"
     ] >
         .demo-box__appbar >
-            div(Attributes) +
+            div(Configuration) +
             mdButton[
                 size       = "medium"
                 variant    = "icon"

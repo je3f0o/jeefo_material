@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : main.sidenav_state.js
 * Created at  : 2021-01-18
-* Updated at  : 2021-02-23
+* Updated at  : 2021-02-28
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -22,18 +22,14 @@ demoBox >
         mdTab[mdEmphasis="high"](Sidenav) ^
     attributes >
         mdSelection >
-            mdCheckbox[
-                color     = "primary"
-                isChecked = "is_open"
-            ] +
+            mdCheckbox[value="is_open"] +
             label(is-open) ^
         .attr-header[mdEmphasis="medium"](Variant) +
         mdSelection[align="middle"] >
             mdRadio[
                 name       = "variant"
                 value      = "side"
-                color      = "primary"
-                (change)   = "change_variant($element.DOM_element)"
+                (change)   = "variant = $element.DOM_element.value"
                 isSelected = "variant === 'side'"
             ] +
             label(side) ^
@@ -41,8 +37,7 @@ demoBox >
             mdRadio[
                 name       = "variant"
                 value      = "over"
-                color      = "primary"
-                (change)   = "change_variant($element.DOM_element)"
+                (change)   = "variant = $element.DOM_element.value"
                 isSelected = "variant === 'over'"
             ] +
             label(over) ^
@@ -51,8 +46,7 @@ demoBox >
             mdRadio[
                 name       = "position"
                 value      = "left"
-                color      = "primary"
-                (change)   = "change_position($element.DOM_element)"
+                (change)   = "position = $element.DOM_element.value"
                 isSelected = "position === 'left'"
             ] +
             label(left) ^
@@ -60,8 +54,7 @@ demoBox >
             mdRadio[
                 name       = "position"
                 value      = "right"
-                color      = "primary"
-                (change)   = "change_position($element.DOM_element)"
+                (change)   = "position = $element.DOM_element.value"
                 isSelected = "position === 'right'"
             ] +
             label(right)
