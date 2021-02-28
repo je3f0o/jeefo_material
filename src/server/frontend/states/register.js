@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : register.js
 * Created at  : 2021-01-14
-* Updated at  : 2021-02-27
+* Updated at  : 2021-02-28
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -19,6 +19,7 @@ const router = require("@jeefo/state");
 
 router.register("main"            , require("./main_state"));
 router.register("main.card"       , require("./main.card_state"));
+router.register("main.fabs"       , require("./main.fabs_state"));
 router.register("main.button"     , require("./main.button_state"));
 router.register("main.inputs"     , require("./main.inputs_state"));
 router.register("main.selection"  , require("./main.selection_state"));

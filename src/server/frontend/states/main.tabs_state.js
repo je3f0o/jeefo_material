@@ -22,35 +22,7 @@ demoBox >
         mdTab(Fixed) +
         mdTab(Scrollable) ^
     attributes >
-        [style="padding: 8px 0 4px 10px; color: #666;"](Color) +
-        mdSelection >
-            mdRadio[
-                name       = "color"
-                color      = "primary"
-                value      = ""
-                isSelected = "color === ''"
-                (change)   = "color = $element.value"
-            ] +
-            label(Default) ^
-        mdSelection >
-            mdRadio[
-                name       = "color"
-                color      = "primary"
-                value      = "primary"
-                isSelected = "color === 'primary'"
-                (change)   = "color = $element.value"
-            ] +
-            label(Primary) ^
-        mdSelection >
-            mdRadio[
-                name       = "color"
-                color      = "primary"
-                value      = "secondary"
-                isSelected = "color === 'secondary'"
-                (change)   = "color = $element.value"
-            ] +
-            label(Secondary)
-        ^   ^
+        .demo-box__attr-title[mdEmphasis="high"](Not completed yet) ^
     [
         style   = "width: 100%; padding: 0 16px; box-sizing: border-box;"
         jfClass = "{ hide: $demo_box.index !== 0 }"

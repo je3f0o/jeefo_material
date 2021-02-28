@@ -61,11 +61,11 @@ mdTypography[
             ](Components) +
             mdList[mdEmphasis="medium"] >
                 mdListLink[
-                    href       = "/{{c}}"
-                    style      = "padding-left: 24px; text-transform: capitalize;"
+                    href       = "/{{c.url}}"
+                    style      = "padding-left: 24px;"
                     forEach    = "c in components"
                 ] >
-                    span({{c}})
+                    span({{c.label}})
             ^   ^   ^
         .main >
             mdAppBar[color="{{ app_bar_color }}"] >
@@ -135,16 +135,16 @@ class MainState {
         ];
 
         this.components = [
-            "tabs",
-            "card",
-            "list",
-            "inputs",
-            "buttons",
-            "surface",
-            "sidenav",
-            //"scrollable",
-            "selection",
-        ].sort();
+            {label: "Tabs"                             , url: "tabs"      } ,
+            {label: "Card"                             , url: "card"      } ,
+            {label: "List"                             , url: "list"      } ,
+            {label: "Inputs"                           , url: "inputs"    } ,
+            {label: "Buttons"                          , url: "buttons"   } ,
+            {label: "Buttons (floating action button)" , url: "fabs"      } ,
+            {label: "Surface"                          , url: "surface"   } ,
+            {label: "Sidenav"                          , url: "sidenav"   } ,
+            {label: "Selection"                        , url: "selection" } ,
+        ].sort((a, b) => a.label.localeCompare(b.label));
     }
 
     get is_open () {
