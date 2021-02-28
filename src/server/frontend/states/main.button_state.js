@@ -47,7 +47,10 @@ demoBox >
             .demo-box__attr-title[mdEmphasis="high"](No options) +
         ^   ^
     [jfClass="{ hide: $demo_box.index !== 0 }"] >
-        mdButton[variant="{{ variant }}" isDisabled="is_disabled"](Button)
+        mdButton[variant="{{ variant }}" isDisabled="is_disabled"](Button) ^
+    [jfClass="{ hide: $demo_box.index !== 1 }"] >
+        mdButton[variant="icon" isDisabled="is_disabled"] >
+            mdIcon[name="stars"]
 `;
 
 class MDButtonState {
