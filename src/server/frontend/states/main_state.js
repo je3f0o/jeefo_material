@@ -15,8 +15,11 @@
 
 // ignore:end
 
-const router   = require("@jeefo/state");
-const md_media = require("@jeefo/material/services/media");
+const router        = require("@jeefo/state");
+const md_media      = require("@jeefo/material/services/media");
+const theme_service = require("@jeefo/material/services/theme");
+
+const html = document.querySelector("html");
 
 const style = `
 /* sass */
@@ -44,8 +47,9 @@ input, select, textarea, a
 const template = `
 {jt}
 mdTypography[
-    style   = "height: 100vh; display: block;"
-    mdTheme = "{{ theme }}"
+    style    = "height: 100vh; display: block;"
+    mdTheme  = "{{ theme }}"
+    (change) = "change_bg()"
 ] >
     mdSidenavContainer >
         mdSidenav[
@@ -163,6 +167,11 @@ class MainState {
     is_selected (path) {
         const regex = new RegExp(`/${path}(?:\?.*)?`);
         return regex.test(path);
+    }
+
+    change_bg () {
+        const theme = theme_service.themes.find(t => this.theme === t.name);
+        html.style.backgroundColor = theme.vars["$background-color"];
     }
 
     on_destroy () {

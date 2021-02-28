@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : theme.js
 * Created at  : 2021-02-27
-* Updated at  : 2021-02-27
+* Updated at  : 2021-02-28
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -88,7 +88,8 @@ class MDTheme {
                         value = fn(this, args);
                     }
                 } else if (is_var_name(value)) {
-                    value = this.eval(value);
+                    debugger
+                    value = this.eval_variable(value);
                 }
                 css_rules.push(`${prop}:${value}`);
             }
