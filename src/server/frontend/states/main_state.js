@@ -121,15 +121,15 @@ class MainState {
 
         this.colors = [
             {
-                name  : "Default",
+                label : "Default",
                 value : '',
             },
             {
-                name  : "Primary",
+                label : "Primary",
                 value : "primary",
             },
             {
-                name  : "Secondary",
+                label : "Secondary",
                 value : "secondary",
             },
         ];

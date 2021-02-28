@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : main.surface_state.js
 * Created at  : 2021-01-19
-* Updated at  : 2021-02-04
+* Updated at  : 2021-02-28
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -30,38 +30,17 @@ demoBox >
     mdTabs >
         mdTab(Surface) ^
     attributes >
-        [style="padding: 8px 0 4px 10px; color: #666;"](Color) +
-        mdSelection >
+        .demo-box__attr-title[mdEmphasis="high"](Color) +
+        mdSelection[forEach="c in colors"] >
             mdRadio[
                 name       = "color"
-                color      = "primary"
-                value      = ""
-                isSelected = "color === ''"
+                value      = "{{ c.value }}"
+                isSelected = "color === c.value"
                 (change)   = "color = $element.value"
             ] +
-            label(Default) ^
-        mdSelection >
-            mdRadio[
-                name       = "color"
-                color      = "primary"
-                value      = "primary"
-                isSelected = "color === 'primary'"
-                (change)   = "color = $element.value"
-            ] +
-            label(Primary) ^
-        mdSelection >
-            mdRadio[
-                name       = "color"
-                color      = "primary"
-                value      = "secondary"
-                isSelected = "color === 'secondary'"
-                (change)   = "color = $element.value"
-            ] +
-            label(Secondary)
+            label({{ c.label }})
         ^   ^
-        mdSurface.demo-surface[
-            color="{{ color }}"
-        ](Content)
+    mdSurface.demo-surface[color="{{ color }}"](Content)
 `;
 
 class MDSurfaceState {
