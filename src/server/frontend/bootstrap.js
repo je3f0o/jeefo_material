@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : bootstrap.js
 * Created at  : 2021-01-14
-* Updated at  : 2021-02-28
+* Updated at  : 2021-03-11
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -70,50 +70,17 @@ const sheet = {};
 const rules = {};
 
 Object.assign(sheet, {
-    /*
-    // MD Input
-    '.md-input.md-input--primary.md-input--focused': {
-        "color" : "$primary-color-A100",
-    },
-    '.md-input.md-input--secondary.md-input--focused': {
-        "color" : "$secondary-color-A100",
-    },
-    '.md-input.md-input--error': {
-        "color" : "$error-color-A200",
-    },
-    '.md-input .md-input__foreground': {
-        "color" : "$on_surface-color",
-    },
-    '.md-input--filled .md-input__input-wrapper': {
-        "background-color" : "$background-color",
-    },
-    '.md-input--filled .md-input__target': {
-        "background-color" : "rgba(255,255,255,.12)",
-    },
-    '.md-input--filled .md-input__target:hover': {
-        "background-color" : "rgba(255,255,255,.14)",
-    },
-    '.md-input--filled.md-input--focused .md-input__target': {
-        "background-color" : "rgba(255,255,255,.16)",
-    },
-
-    // MD Link
-    '.md-link.md-link--primary': {
-        "color" : "$primary-color-A100",
-    },
-    '.md-link.md-link--secondary': {
-        "color" : "$secondary-color-A100",
-    },
-    */
-
     // MD Emphasis
     ".demo-box__body": {
         "background-color": "rgba(0,0,0,.02)",
     },
 });
+rules[".md-card > .md-surface > .md-toolbar"] = {
+    "color"           : "$on_primary-color",
+    "background-color": "$primary-color",
+};
 
-const elevation_rule_setter = require("./md_elevation");
-elevation_rule_setter(rules);
+const elevation_rule_setter = require("@jeefo/material/attributes/elevation");
 require("./md_icons");
 
 md_theme.register_theme({
@@ -125,6 +92,7 @@ md_theme.register_theme({
         surface       : "#fff",
         background    : "#fff",
 
+        status        : "#311b92", // deep_purple-900
         divider       : "rgba(black, .12)",
 
         on_error      : "#fff",
@@ -137,16 +105,17 @@ md_theme.register_theme({
     rules,
 });
 
+delete rules[".md-card > .md-surface > .md-toolbar"];
 elevation_rule_setter(rules, true);
 sheet[".md-surface"] = {
     "color"            : "$on_surface-color",
-    "background-color" : "blend($background-color, white, .05)",
+    "background-color" : "blend($surface-color, white, .05)",
 };
 sheet[".demo-box__body"] = {
     "background-color" : "rgba(0,0,0,.5)",
 };
 sheet[".md-tabs__button--selected"] = {
-    "color": "#e2e2e2",
+    "color": "rgba($on_surface-color, .87)",
 };
 
 md_theme.register_theme({
@@ -158,6 +127,7 @@ md_theme.register_theme({
         surface           : "#121212",
         background        : "#121212",
 
+        status            : "#2e2e2e", // blend(bg, .12); evelation 8
         divider           : "rgba(white, .12)",
 
         on_error          : "#000",

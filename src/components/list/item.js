@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : item.js
 * Created at  : 2019-10-08
-* Updated at  : 2021-02-19
+* Updated at  : 2021-03-04
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -21,7 +21,10 @@ exports.selector = "md-list-item";
 
 exports.template = `
 {jt}
-jfContent +
+jfContent.md-list__item__avatar[select="md-avatar"] +
+jfContent.md-list__item__support_icon[select="md-icon"] +
+jfContent.md-list__item__content +
+jfContent.md-list__item__meta[select="md-list-meta"] +
 mdRipple
 `;
 

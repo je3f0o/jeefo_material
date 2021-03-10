@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : index.js
 * Created at  : 2020-10-28
-* Updated at  : 2021-02-28
+* Updated at  : 2021-03-11
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -168,9 +168,7 @@ exports.controller = class MDCheckbox {
             }
         });
 
-        observer.on("value", value => input.checked = !!value);
-
-        observer.on("isDisabled", value => {
+        const on_disabled_change = value => {
             if (value) {
                 input.disabled = true;
                 $element.add_class("md-checkbox--disabled");
@@ -179,8 +177,11 @@ exports.controller = class MDCheckbox {
                 $element.remove_class("md-checkbox--disabled");
             }
             $input.trigger("state_changed", {bubbles: false});
-            $element.trigger("state_changed", {bubbles: false});
-        });
+        };
+
+        on_disabled_change(this.isDisabled);
+        observer.on("value"      , value => input.checked = !!value);
+        observer.on("isDisabled" , on_disabled_change);
 
         if (this.value) input.checked = true;
     }

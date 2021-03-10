@@ -1,0 +1,16 @@
+{
+    "error"         : "#cf6679",
+    "primary"       : "#b39ddb",
+    "secondary"     : "#03dac6",
+    "surface"       : "#121212",
+    "background"    : "#121212",
+
+    "status"        : "#b39ddb",
+    "divider"       : "rgba(white, .12)",
+
+    "on_error"      : "#000",
+    "on_primary"    : "#000",
+    "on_secondary"  : "#000",
+    "on_surface"    : "#fff",
+    "on_background" : "#fff"
+}

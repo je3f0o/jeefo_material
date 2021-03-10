@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
-* File Name   : md_emphasis.js
+* File Name   : emphasis.js
 * Created at  : 2021-02-07
-* Updated at  : 2021-02-25
+* Updated at  : 2021-03-07
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -39,7 +39,7 @@ const get_colors = ({surface, theme, $element}) => {
     let bg, fg;
     if (theme) {
         const $theme = theme.$element;
-        theme = md_theme.themes.find(t => theme.name === t.name);
+        theme = md_theme.themes.find(t => t.name === theme.name);
         if (! theme) throw new Error("Invalid theme.");
 
         if (surface && surface.is_closer($theme)) {

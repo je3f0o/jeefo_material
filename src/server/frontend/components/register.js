@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : register.js
 * Created at  : 2021-01-07
-* Updated at  : 2021-02-28
+* Updated at  : 2021-03-08
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -36,6 +36,7 @@ const components = {
     "md-menu"              : "@jeefo/material/components/md_menu",
     "md-list"              : "@jeefo/material/components/list",
     "md-list-item"         : "@jeefo/material/components/list/item",
+    "md-list-meta"         : "@jeefo/material/components/list/meta",
     "md-list-link"         : "@jeefo/material/components/list/link",
     "md-progress-spinner"  : "@jeefo/material/components/md_progress_spinner",
     "md-tabs"              : "@jeefo/material/components/tabs",
@@ -43,6 +44,7 @@ const components = {
     "md-divider"           : "@jeefo/material/components/divider",
     "md-link"              : "@jeefo/material/components/link",
     "md-radio"             : "@jeefo/material/components/radio",
+    "md-image"             : "@jeefo/material/components/image",
     "md-checkbox"          : "@jeefo/material/components/checkbox",
     "md-selection"         : "@jeefo/material/components/selection",
     "md-typography"        : "@jeefo/material/components/typography",

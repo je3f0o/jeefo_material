@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : divider.js
 * Created at  : 2020-10-18
-* Updated at  : 2020-11-18
+* Updated at  : 2021-03-11
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -15,7 +15,7 @@
 
 // ignore:end
 
-const md_theme = require("@jeefo/material/services/theme");
+const theme_service = require("../services/theme");
 
 exports.selector = "md-divider";
 
@@ -25,13 +25,20 @@ exports.style = `
 
 .md-divider
     +size(100%, 1px)
+    display     : block
     flex-shrink : 0
 
     &--vertical
         +size(1px, 100%)
 `;
 
-md_theme.register_template(`
+theme_service.set_default({
+    ".md-divider": {
+        "background-color": "$divider-color"
+    }
+});
+
+theme_service.register_template(`
 /* sass */
 @import '@jeefo/material'
 
@@ -40,7 +47,6 @@ md_theme.register_template(`
 `);
 
 exports.bindings = {
-    variant     : "@",
     orientation : "@",
 };
 
@@ -52,12 +58,6 @@ exports.controller = class MDDivider {
             const orientation = this.orientation.toLowerCase();
             if (orientation === "vertical") {
                 $element.add_class("md-divider--vertical");
-            }
-        }
-
-        if (typeof this.variant === "string") {
-            const variant = this.variant.toLowerCase();
-            switch (variant) {
             }
         }
     }

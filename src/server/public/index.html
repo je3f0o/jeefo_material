@@ -2,11 +2,63 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,minimum-scale=1.0">
     <title jf-bind="Jeefo Framework - initialized">Jeefo Framework</title>
 
+    <!-- Mobile -->
+    <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <!-- Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Apple -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- PWA -->
+    <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png">
+
+    <script>(function () {
+        const get_last_href = () => {
+            const path = localStorage.getItem("last_state_path");
+            if (path) return `${location.origin}${path}`;
+            return location.href;
+        };
+
+        const queries = [];
+        if (navigator.standalone) {
+            const last_url = localStorage.getItem("last_state_url");
+            if (last_url) {
+                const current_url = location.href.slice(location.origin.length);
+                if (current_url !== last_url) {
+                    location.replace(`${location.origin}${last_url}`);
+                }
+            }
+            let theme = localStorage.getItem("theme");
+            switch (theme) {
+                case null:
+                case undefined:
+                case '':
+                case "auto":
+                    const query = "(prefers-color-scheme: dark)";
+                    theme = window.matchMedia(query).matches ? "dark" : "light";
+            }
+            queries.push(`theme=${theme}`);
+        }
+
+        const link  = document.createElement("link");
+        const query = queries.length ? `?${queries.join('&')}` : '';
+        link.setAttribute("rel", "manifest");
+        link.setAttribute("href", `/lbc.webmanifest${query}`);
+        document.head.appendChild(link);
+
+        /*
+        const meta = document.createElement("meta");
+        meta.setAttribute("name", "apple-mobile-web-app-status-bar-style");
+        meta.setAttribute("content", "black-translucent");
+        document.head.appendChild(meta);
+        */
+    })();</script>
+
     <!-- favicon -->
-    <link rel="manifest" href="/jeefo.webmanifest">
     <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
@@ -16,6 +68,6 @@
     <script src="/js/jeefo_core.js"></script>
     <script>jeefo.require("./main.js");</script>
 </head>
-<body ontouchstart="">
+<body>
 </body>
 </html>

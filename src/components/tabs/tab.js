@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : tab.js
 * Created at  : 2019-07-05
-* Updated at  : 2021-02-25
+* Updated at  : 2021-03-03
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -22,12 +22,9 @@ const TranscludeController = require("@jeefo/component/transclude_controller");
 //const button_template = JeefoDOMParser.parse(`
 const transcluder = new TranscludeController(`
 {jt}
-button.md-tabs__button[
-    type       = "button"
-    tabindex   = "-1"
-    mdEmphasis = "{{ $md_tab.is_selected ? '' : 'medium' }}"
-] >
+button.md-tabs__button[type="button" tabindex="-1"] >
     mdTypography[variant="button"] >
+        jfContent[select="md-icon"] +
         jfContent ^
     .md-tabs__button__indicator +
     mdRipple
@@ -59,6 +56,7 @@ exports.dependencies = {
 };
 
 exports.bindings = {
+    variant     : '@',
     is_selected : "=isSelected",
     is_disabled : "<isDisabled",
 };
@@ -75,10 +73,18 @@ exports.controller = class MDTab extends EventEmitter {
             if (md_tabs.selected !== this) md_tabs.select(this);
         });
 
+        const on_variant_change = (new_value, old_value) => {
+            $element.remove_class(`md-tabs__button--${old_value}`);
+            if (new_value) $element.add_class(`md-tabs__button--${new_value}`);
+        };
+
         const on_selected_change = value => {
             if (value && md_tabs.selected !== this) md_tabs.select(this);
         };
+
+        on_variant_change(this.variant);
         on_selected_change(this.is_selected);
+        observer.on("variant", on_variant_change);
         observer.on("is_selected", on_selected_change);
 
         return;

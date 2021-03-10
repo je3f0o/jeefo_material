@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : index.js
 * Created at  : 2019-10-07
-* Updated at  : 2021-02-26
+* Updated at  : 2021-03-07
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -43,6 +43,11 @@ exports.style = `
         display     : flex
         align-items : center
 
+        > .md-icon
+            margin-right: 32px
+        &__meta
+            margin-left: auto
+
         &:focus
             outline: none
 
@@ -74,10 +79,10 @@ md_theme.register_template(`
 */
 
 exports.template = `
-    { jt }
-    jfContent[select="md-list-item"] +
-    jfContent[select="md-list-link"] +
-    jfContent[select="md-list-divider"]
+{ jt }
+jfContent[select="md-list-item"] +
+jfContent[select="md-list-link"] +
+jfContent[select="md-list-divider"]
 `;
 
 exports.controller = class MDList {

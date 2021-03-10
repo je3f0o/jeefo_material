@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : main.list_state.js
 * Created at  : 2021-01-18
-* Updated at  : 2021-02-28
+* Updated at  : 2021-03-04
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -71,7 +71,10 @@ demoBox >
     [style="padding: 40px; width: 100%;"] >
         mdCard[shape="square" variant="outlined"] >
             mdList >
-                mdListItem[forEach="item in items"]({{ item }})
+                mdListItem[forEach="item in items"] >
+                    mdIcon[name="favorite"] +
+                    div(List item) +
+                    mdListMeta[mdEmphasis="medium"](Meta)
 `;
 
 class MDListState {
@@ -79,13 +82,7 @@ class MDListState {
     static get template () { return template;  }
 
     on_init () {
-        this.items = [
-            "List item one",
-            "List item two",
-            "List item three",
-            "List item four",
-            "List item five",
-        ];
+        this.items = Array(3).fill(1);
         this.before = "none";
         this.after  = "none";
 

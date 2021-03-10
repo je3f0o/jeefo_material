@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : index.js
 * Created at  : 2020-10-08
-* Updated at  : 2021-02-28
+* Updated at  : 2021-03-02
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -28,8 +28,8 @@ exports.style = `
 .md-button
     $root: &
 
+    +button
     +flex-center($is_inline: true)
-    cursor          : pointer
     border          : none
     height          : 36px
     min-width       : 64px
@@ -44,17 +44,9 @@ exports.style = `
     vertical-align  : middle
     text-decoration : none
 
-    -webkit-user-select : none
-    -moz-user-select    : none
-    -ms-user-select     : none
-    user-select         : none
-    -webkit-tap-highlight-color: transparent
-
     &:disabled
-        color          : currentColor
-        cursor         : default
-        opacity        : .38
-        pointer-events : none
+        color   : currentColor
+        opacity : .38
 
     .md-ripple
         border-radius: 4px

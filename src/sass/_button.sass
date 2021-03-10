@@ -1,0 +1,13 @@
+
+@import './user_select'
+
+=button
+    +user-select(none)
+    margin                      : 0
+    cursor                      : pointer
+    white-space                 : nowrap
+    -webkit-tap-highlight-color : transparent
+
+    &:disabled
+        cursor         : default
+        pointer-events : none

@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : register.js
 * Created at  : 2021-01-14
-* Updated at  : 2021-02-28
+* Updated at  : 2021-03-08
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -25,6 +25,8 @@ router.register("main.inputs"     , require("./main.inputs_state"));
 router.register("main.selection"  , require("./main.selection_state"));
 router.register("main.tabs"       , require("./main.tabs_state"));
 router.register("main.list"       , require("./main.list_state"));
+router.register("main.settings"   , require("./main.settings_state"));
+router.register("main.shader"     , require("./main.shader_state"));
 router.register("main.surface"    , require("./main.surface_state"));
 router.register("main.sidenav"    , require("./main.sidenav_state"));
 router.register("main.scrollable" , require("./main.scrollable_state"));

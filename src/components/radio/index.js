@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : index.js
 * Created at  : 2021-01-31
-* Updated at  : 2021-02-26
+* Updated at  : 2021-03-11
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -165,21 +165,12 @@ exports.controller = class MDRadioButton {
         const input    = $input.DOM_element;
         const observer = new Observer(this);
 
-        $input.on("change", () => {
-            if (input.checked && input.name) {
-                this.deactivate_others(input);
-            }
-        });
-
         observer.on("isSelected", value => {
             if (value) input.checked = true;
-            else if (input.checked) {
-                input.checked = false;
-                $input.trigger("change");
-            }
+            else if (input.checked) input.checked = false;
         });
 
-        observer.on("isDisabled", value => {
+        const on_disabled_change = value => {
             if (value) {
                 input.disabled = true;
                 $element.add_class("md-radio--disabled");
@@ -188,10 +179,17 @@ exports.controller = class MDRadioButton {
                 $element.remove_class("md-radio--disabled");
             }
             $input.trigger("state_changed", {bubbles: false});
-            $element.trigger("state_changed", {bubbles: false});
-        });
+        };
 
         if (this.isSelected) input.checked = true;
+        on_disabled_change(this.isDisabled);
+        observer.on("isDisabled", on_disabled_change);
+
+        $input.on("change", () => {
+            if (input.checked && input.name) {
+                this.deactivate_others(input);
+            }
+        });
     }
 
     deactivate_others (input) {
@@ -208,7 +206,7 @@ exports.controller = class MDRadioButton {
         for (const $i of $inputs) {
             if ($i.DOM_element !== input) {
                 $i.DOM_element.checked = false;
-                $i.trigger("change");
+                $i.trigger("state_changed", {bubbles: false});
             }
         }
     }

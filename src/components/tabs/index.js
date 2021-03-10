@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : index.js
 * Created at  : 2019-07-04
-* Updated at  : 2021-02-26
+* Updated at  : 2021-03-03
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -31,6 +31,8 @@ exports.style = `
 @import '@jeefo/material'
 
 .md-tabs
+    $root: &
+
     display  : block
     overflow : hidden
 
@@ -39,34 +41,57 @@ exports.style = `
         margin-bottom  : -20px
         padding-bottom :  20px
 
-    &__scroller
+    &__content
         display: flex
 
     &__button
         +rel
+        +button
         +flex-center
         flex       : 1 0 auto
         border     : none
-        cursor     : pointer
         height     : 48px
-        padding    : 0 16px
+        padding    : 0 24px
         outline    : none
         background : transparent
         transition : color .25s ease
+
+        .md-icon + *
+            margin-left: 8px
 
         &--selected &__indicator
             +abs($bottom: 0)
             +size(100%, 2px)
             transition    : transform .25s cubic-bezier(.4, 0, .2, 1)
             border-bottom : 2px solid currentColor
+
+        &--stacked
+            height: 72px
+            .md-typography
+                display         : flex
+                align-items     : center
+                flex-direction  : column
+            .md-icon + *
+                margin: 6px 0 0
+
+    &--scrollable
+        & #{$root}__scroller,
+        & #{$root}__content
+            float: left
 `;
 
 theme_service.set_default({
     ".md-tabs__button": {
-        "color": "rgba($on_surface-color, .38)",
+        "color": "rgba($on_surface-color, .6)",
     },
     ".md-tabs__button--selected": {
         "color": "$primary-color"
+    },
+    ".md-tabs--scrollable .md-tabs__scroller": {
+        "padding" : "0 40px",
+    },
+    ".md-tabs--scrollable .md-tabs__content": {
+        "background-color" : "rgba($on_surface-color, .04)",
     },
 });
 
@@ -75,26 +100,37 @@ theme_service.register_template(`
 @import '@jeefo/material'
 
 .md-tabs
+    $root: &
+
     &__button
         +property-template(color)
         &--selected
             +property-template(color)
+
+    &--scrollable
+        & #{$root}__scroller
+            +property-template(padding)
+        & #{$root}__content
+            +property-template(background-color)
 `);
 
 exports.template = `
 {jt}
 .md-tabs__scroll-wrapper >
     .md-tabs__scroller >
-        jfContent[select="md-tab"]
+        .md-tabs__content >
+            jfContent[select="md-tab"]
 `;
 
 exports.bindings = {
-    index: '=',
-    color: '@',
+    index   : '=',
+    variant : '@',
 };
 
 exports.controller = class MDTabs extends EventEmitter {
     on_init ($element) {
+        const observer = new Observer(this);
+
         $element.add_class("md-tabs");
         this.tabs     = [];
         this.selected = null;
@@ -107,17 +143,12 @@ exports.controller = class MDTabs extends EventEmitter {
             this.initialized = true;
         });
 
-        const name          = "md-tabs";
-        const observer      = new Observer(this);
-        const modifiers     = ['', "primary", "secondary"];
-        const {DOM_element} = $element;
-
-        const on_color_change = class_modifier(DOM_element, name, modifiers);
-        observer.on("color", v => on_color_change(v.toLowerCase()));
-
-        if (typeof this.color === "string") {
-            on_color_change(this.color.toLowerCase());
-        }
+        const on_variant_change = (new_value, old_value) => {
+            $element.remove_class(`md-tabs--${old_value}`);
+            if (new_value) $element.add_class(`md-tabs--${new_value}`);
+        };
+        on_variant_change(this.variant);
+        observer.on("variant", on_variant_change);
 
         return;
         const el             = $element.DOM_element;

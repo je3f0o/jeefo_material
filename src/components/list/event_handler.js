@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : event_handler.js
 * Created at  : 2021-01-19
-* Updated at  : 2021-02-19
+* Updated at  : 2021-03-07
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -53,10 +53,13 @@ class IMDListItem extends Interface {
                     break;
                 }
                 case KEY_ENTER:
+                    this.md_list_ctrl.select(this);
+                    break;
                 case KEY_SPACE:
                     event.preventDefault();
-                    this.md_list_ctrl.select(this);
-                    this.$element.trigger("selected");
+                    if (DOM_element.tagName === "A") {
+                        DOM_element.click();
+                    }
                     break;
             }
         });

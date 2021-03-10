@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : demo_box.js
 * Created at  : 2021-01-24
-* Updated at  : 2021-02-28
+* Updated at  : 2021-03-11
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -24,20 +24,20 @@ exports.style = `
 
 .demo-box
     $root: &
+    $height: 400px
 
-    height     : 400px
     border     : 1px solid
     display    : block
     transition : box-shadow 150ms linear
+
+    &.no-appbar &__titlebar
+        display: none
 
     .demo-sidenav
         width: 200px
 
     &:hover
         box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.08), 0 0 15px 0 rgba(0, 0, 0, 0.02), 0 0 20px 4px rgba(0, 0, 0, 0.06)
-
-    .md-theme--viewport--xs &
-        margin: 0 -16px
 
     &__attr-title
         padding: 12px 0 4px 10px
@@ -56,8 +56,9 @@ exports.style = `
         display: block
 
     &__body
-        +size(100%, calc(100% - 48px))
         +flex-center
+        width: 100%
+        min-height: $height - 48px
 
     .md-button
         flex-shrink : 0
@@ -145,7 +146,7 @@ mdSidenavContainer[mdElevation="1"] >
         variant  = "{{ $demo_box.mode }}"
         position = "right"
     ] >
-        .demo-box__appbar >
+        .demo-box__appbar[style="position: relative; z-index: 1;"] >
             div(Configuration) +
             mdButton[
                 size       = "medium"
@@ -155,13 +156,19 @@ mdSidenavContainer[mdElevation="1"] >
             ] >
                 mdIcon[name="close"]
             ^   ^
-        mdScrollable[style="height: calc(100% - 48px)"] >
-            jfContent.demo-box__attributes[select="attributes"]
+        mdScrollable[
+            style="position: absolute; top: 0; padding-top: 48px"
+        ] >
+            jfContent.demo-box__attributes[
+                select        = "attributes"
+                (initialized) = "$demo_box.has_attrs = true;"
+            ]
         ^   ^
     mdSurface >
-        .demo-box__appbar >
+        .demo-box__appbar.demo-box__titlebar >
             jfContent[select="md-tabs" index="$demo_box.index"] +
             mdButton[
+                if         = "$demo_box.has_attrs"
                 size       = "medium"
                 variant    = "icon"
                 jfClass    = "{ hide: $demo_box.is_open && $demo_box.mode === 'side' }"
@@ -176,11 +183,12 @@ mdSidenavContainer[mdElevation="1"] >
 
 exports.controller = class DemoBox {
     on_init ($element) {
-        this.index = -1;
+        this.index     = -1;
+        this.has_attrs = $element.first("attributes") !== null;
         $element.add_class("demo-box");
 
         const on_media_change = () => {
-            if (md_media.is("gt-xs")) {
+            if (md_media.is("gt-xs") && this.has_attrs) {
                 this.mode    = "side";
                 this.is_open = true;
             } else {
@@ -188,6 +196,7 @@ exports.controller = class DemoBox {
                 this.is_open = false;
             }
         };
+
         on_media_change();
         md_media.on("breakpoint_changed", on_media_change);
     }
