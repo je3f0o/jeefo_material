@@ -87,12 +87,12 @@ demoBox.full.no-appbar[style="border:none"] >
         mdCard.demo-card[
             shape   = "{{ shape }}"
             variant = "{{ variant }}"
-        ] >
+        ] > [mdEmphasis = "medium"] >
             .header >
                 .demo-card__avatar(J) +
                 .title >
                     mdTypography[variant="subtitle-1" mdEmphasis="high"](Shrimp and Chorizo Paella) +
-                    mdTypography[variant="subtitle-2" mdEmphasis="medium" style="margin-top: 2px;"](September 14, 2016) ^
+                    mdTypography[variant="subtitle-2" style="margin-top: 2px;"](September 14, 2016) ^
                 mdButton[
                     size      = "medium"
                     variant   = "icon"
