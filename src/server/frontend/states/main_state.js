@@ -20,9 +20,8 @@ const md_media      = require("@jeefo/material/services/media");
 const theme_service = require("@jeefo/material/services/theme");
 
 const html = document.querySelector("html");
-const body = document.querySelector("body");
 
-const ios_status_query = 'meta[name="apple-mobile-web-app-status-bar-style"]';
+//const ios_status_query = 'meta[name="apple-mobile-web-app-status-bar-style"]';
 //const ios_status_meta  = html.querySelector(ios_status_query);
 //const manifest_el      = html.querySelector('link[rel="manifest"]');
 
@@ -291,11 +290,8 @@ class MainState {
 
     on_theme_changed ({name, value}) {
         const theme = theme_service.themes.find(t => t.name === name);
-        body.style.backgroundColor = theme.vars["$status-color"];
+        document.body.style.backgroundColor = theme.vars["$status-color"];
         localStorage.setItem("theme", value);
-        if (value === "auto") {
-
-        }
     }
 
     on_destroy () {
