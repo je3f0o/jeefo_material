@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : container.js
 * Created at  : 2019-06-21
-* Updated at  : 2021-02-28
+* Updated at  : 2021-03-11
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -46,6 +46,8 @@ $anim_duration: .4s
 
     &__content
         @extend %full-height
+        +rel
+        z-index: 0
 
     &__backdrop
         +abs($all: 0)

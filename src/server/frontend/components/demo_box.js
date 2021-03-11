@@ -30,6 +30,12 @@ exports.style = `
     display    : block
     transition : box-shadow 150ms linear
 
+    &.vert
+        #{$root}__body
+            flex-direction: column
+            & > *
+                flex-grow: 1
+
     &.no-appbar &__titlebar
         display: none
 

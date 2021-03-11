@@ -1,7 +1,7 @@
 /* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 * File Name   : main.sidenav_state.js
 * Created at  : 2021-01-18
-* Updated at  : 2021-02-28
+* Updated at  : 2021-03-11
 * Author      : jeefo
 * Purpose     :
 * Description :
@@ -17,7 +17,7 @@
 
 const template = `
 {jt}
-demoBox >
+demoBox.vert >
     mdTabs >
         mdTab[mdEmphasis="high"](Sidenav) ^
     attributes >
@@ -59,24 +59,23 @@ demoBox >
             ] +
             label(right)
         ^   ^
-    [style="width: 100%; height: 100%;"] >
-        mdSidenavContainer >
-            mdSidenav[
-                style    = "width: 200px;"
-                isOpen   = "is_open"
-                variant  = "{{ variant }}"
-                position = "{{ position }}"
-            ] >
-                mdTypography[
-                    variant="h4"
-                    style="text-align: center; padding: 16px;"
-                ](Sidenav content) ^
-            .center >
-                mdTypography[variant="h5"](Main content) +
-                mdTypography[variant="subtitle-2"] >
-                    div(is_open: {{ is_open }}) +
-                    div(variant: {{ variant }}) +
-                    div(position: {{ position }})
+    mdSidenavContainer[style="height: 352px;"] >
+        mdSidenav[
+            style    = "width: 200px;"
+            isOpen   = "is_open"
+            variant  = "{{ variant }}"
+            position = "{{ position }}"
+        ] >
+            mdTypography[
+                variant="h4"
+                style="text-align: center; padding: 16px;"
+            ](Sidenav content) ^
+        .center >
+            mdTypography[variant="h5"](Main content) +
+            mdTypography[variant="subtitle-2"] >
+                div(is_open: {{ is_open }}) +
+                div(variant: {{ variant }}) +
+                div(position: {{ position }})
 `;
 
 class MDSidenavState {
