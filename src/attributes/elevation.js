@@ -15,8 +15,7 @@
 
 // ignore:end
 
-const styles        = require("@jeefo/component/styles");
-const theme_service = require("../services/theme");
+const styles = require("@jeefo/component/styles");
 
 const elevation_levels = [1, 2, 3, 4, 6, 8, 12, 16, 24];
 const transparencies   = {
@@ -31,37 +30,40 @@ const transparencies   = {
     24 : 0.16,
 };
 
-(() => {
-    const rules = [];
-    for (const level of elevation_levels) {
-        rules.push(`[md-elevation="${level}"]{z-index:${level}}`);
-    }
-    styles.add_style(rules.join(''), {"md-attribute" : "md-elevation"});
-})();
-
-theme_service.register_template(`
+const style = `
 /* sass */
 @import '@jeefo/material'
 
 [md-elevation="1"]
-	+box-shadow(1)
+    +box-shadow(1)
+    z-index: 1
 [md-elevation="2"]
-	+box-shadow(2)
+    +box-shadow(2)
+    z-index: 2
 [md-elevation="3"]
-	+box-shadow(3)
+    +box-shadow(3)
+    z-index: 3
 [md-elevation="4"]
-	+box-shadow(4)
+    +box-shadow(4)
+    z-index: 4
 [md-elevation="6"]
-	+box-shadow(6)
+    +box-shadow(6)
+    z-index: 6
 [md-elevation="8"]
-	+box-shadow(8)
+    +box-shadow(8)
+    z-index: 8
 [md-elevation="12"]
-	+box-shadow(12)
+    +box-shadow(12)
+    z-index: 12
 [md-elevation="16"]
-	+box-shadow(16)
+    +box-shadow(16)
+    z-index: 16
 [md-elevation="24"]
-	+box-shadow(24)
-`);
+    +box-shadow(24)
+    z-index: 24
+`;
+
+styles.add_style(style, {"md-attribute" : "md-elevation"});
 
 module.exports = (rules, is_dark) => {
     if (is_dark) {
