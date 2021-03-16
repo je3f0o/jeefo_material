@@ -1,9 +1,0 @@
-# Node Modules
-node_modules
-
-# Temp fodler
-.temp_publish_dir
-
-# Server's node modules
-src/server/node_modules
-src/server/.caches
