@@ -23,7 +23,7 @@ rsync -am --stats src/server --exclude=node_modules "$temp_dir"
 
 # publish
 pushd "$temp_dir"
-#npm publish
+npm publish
 
 # finalize
 if [ $? == 0 ]; then
