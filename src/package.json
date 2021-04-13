@@ -1,15 +1,14 @@
 {
-    "name": "@jeefo/utils",
-    "version": "0.0.9",
-    "homepage": "https://github.com/je3f0o/jeefo_utils",
-    "copyright": "2017",
-    "description": "Basic javascript utility helpers for jeefo framework and nodejs.",
+    "name": "@jeefo/material",
+    "version": "0.0.7",
+    "homepage": "https://github.com/je3f0o/jeefo_material",
+    "copyright": "2019",
+    "description": "yet another material design library for jeefo framework. (under developing...)",
     "author": {
         "name": "je3f0o",
         "email": "je3f0o@gmail.com"
     },
     "license": "MIT",
-    "main": "index.js",
     "scripts": {
         "save": "git add . && git c \"`date`\" && git p",
         "save_version": "git add . && git c \"v$npm_package_version\" && git p",
@@ -17,15 +16,11 @@
     },
     "repository": {
         "type": "git",
-        "url": "git@github.com:je3f0o/jeefo_utils.git"
+        "url": "git@github.com:je3f0o/jeefo_material.git"
     },
     "keywords": [
         "jeefo",
         "je3f0o",
-        "utils"
-    ],
-    "devDependencies": {
-        "@jeefo/publish": "0.0.31"
-    },
-    "dependencies": {}
+        "jeefo_material"
+    ]
 }
